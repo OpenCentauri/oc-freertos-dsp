@@ -1,23 +1,23 @@
-/* This linker script generated from xt-genldscripts.tpp for LSP ./arch/sun8iw20/lsp/dsp0_jtag */
+/* This linker script generated from xt-genldscripts.tpp for LSP min-rt */
 /* Linker Script for default link */
+
+
 MEMORY
 {
-  iram0_0_seg :                       	org = 0x00400000, len = 0x660
-  iram0_1_seg :                       	org = 0x00400660, len = 0x9A0
+  iram0_1_seg :                       	org = 0x00400000, len = 0x1000
   iram0_2_seg :                       	org = 0x00401000, len = 0x17C
-  iram0_3_seg :                       	org = 0x0040117C, len = 0x20
-  iram0_4_seg :                       	org = 0x0040119C, len = 0x20
-  iram0_5_seg :                       	org = 0x004011BC, len = 0x20
-  iram0_6_seg :                       	org = 0x004011DC, len = 0x20
-  iram0_7_seg :                       	org = 0x004011FC, len = 0x20
-  iram0_8_seg :                       	org = 0x0040121C, len = 0x20
-  iram0_9_seg :                       	org = 0x0040123C, len = 0xEDC4
-  ddr1_0_seg :                        	org = 0x42000000, len = 0x100000
+  iram0_3_seg :                       	org = 0x00401178, len = 0x20
+  iram0_4_seg :                       	org = 0x00401198, len = 0x20
+  iram0_5_seg :                       	org = 0x004011B8, len = 0x20
+  iram0_6_seg :                       	org = 0x004011D8, len = 0x20
+  iram0_7_seg :                       	org = 0x004011F8, len = 0x20
+  iram0_8_seg :                       	org = 0x00401218, len = 0x20
+  iram0_9_seg :                       	org = 0x00401238, len = 0xEDC4
+  ddr1_0_seg :                        	org = 0x40900000, len = 0x400000
 }
 
 PHDRS
 {
-  iram0_0_phdr PT_LOAD;
   iram0_1_phdr PT_LOAD;
   iram0_2_phdr PT_LOAD;
   iram0_3_phdr PT_LOAD;
@@ -28,7 +28,6 @@ PHDRS
   iram0_8_phdr PT_LOAD;
   iram0_9_phdr PT_LOAD;
   ddr1_0_phdr PT_LOAD;
-  ddr1_0_bss_phdr PT_LOAD;
 }
 
 
@@ -37,78 +36,40 @@ ENTRY(_ResetVector)
 
 
 /*  Memory boundary addresses:  */
-_memmap_mem_iram0_start = 0x400000;
-_memmap_mem_iram0_end   = 0x410000;
-_memmap_mem_ddr1_start = 0x42000000;
-_memmap_mem_ddr1_end   = 0x42100000;
+
+_memmap_seg_iram0_0_start = 0x400000;
+_memmap_seg_iram0_0_max   = 0x410000;
+
+_memmap_mem_ddr1_start = 0x37900000;
+_memmap_mem_ddr1_end   = 0x37b00000;
 
 /*  Memory segment boundary addresses:  */
-_memmap_seg_iram0_0_start = 0x400000;
-_memmap_seg_iram0_0_max   = 0x400660;
-_memmap_seg_iram0_1_start = 0x400660;
-_memmap_seg_iram0_1_max   = 0x401000;
-_memmap_seg_iram0_2_start = 0x401000;
-_memmap_seg_iram0_2_max   = 0x40117c;
-_memmap_seg_iram0_3_start = 0x40117c;
-_memmap_seg_iram0_3_max   = 0x40119c;
-_memmap_seg_iram0_4_start = 0x40119c;
-_memmap_seg_iram0_4_max   = 0x4011bc;
-_memmap_seg_iram0_5_start = 0x4011bc;
-_memmap_seg_iram0_5_max   = 0x4011dc;
-_memmap_seg_iram0_6_start = 0x4011dc;
-_memmap_seg_iram0_6_max   = 0x4011fc;
-_memmap_seg_iram0_7_start = 0x4011fc;
-_memmap_seg_iram0_7_max   = 0x40121c;
-_memmap_seg_iram0_8_start = 0x40121c;
-_memmap_seg_iram0_8_max   = 0x40123c;
-_memmap_seg_iram0_9_start = 0x40123c;
-_memmap_seg_iram0_9_max   = 0x410000;
-_memmap_seg_ddr1_0_start = 0x42000000;
-_memmap_seg_ddr1_0_max   = 0x42100000;
+
 
 _rom_store_table = 0;
-PROVIDE(_memmap_reset_vector = 0x400660);
+PROVIDE(_memmap_reset_vector = 0x400000);
 PROVIDE(_memmap_vecbase_reset = 0x401000);
 /* Various memory-map dependent cache attribute settings: */
-_memmap_cacheattr_wb_base = 0x00000402;
-_memmap_cacheattr_wt_base = 0x00000102;
-_memmap_cacheattr_bp_base = 0x00000202;
-_memmap_cacheattr_unused_mask = 0xFFFFF0F0;
-_memmap_cacheattr_wb_trapnull = 0x22222422;
-_memmap_cacheattr_wba_trapnull = 0x22222422;
-_memmap_cacheattr_wbna_trapnull = 0x22222522;
-_memmap_cacheattr_wt_trapnull = 0x22222122;
+_memmap_cacheattr_wb_base = 0x00000042;
+_memmap_cacheattr_wt_base = 0x00000012;
+_memmap_cacheattr_bp_base = 0x00000022;
+_memmap_cacheattr_unused_mask = 0xFFFFFF00;
+_memmap_cacheattr_wb_trapnull = 0x22222242;
+_memmap_cacheattr_wba_trapnull = 0x22222242;
+_memmap_cacheattr_wbna_trapnull = 0x22222252;
+_memmap_cacheattr_wt_trapnull = 0x22222212;
 _memmap_cacheattr_bp_trapnull = 0x22222222;
-_memmap_cacheattr_wb_strict = 0xFFFFF4F2;
-_memmap_cacheattr_wt_strict = 0xFFFFF1F2;
-_memmap_cacheattr_bp_strict = 0xFFFFF2F2;
-_memmap_cacheattr_wb_allvalid = 0x22222422;
-_memmap_cacheattr_wt_allvalid = 0x22222122;
+_memmap_cacheattr_wb_strict = 0xFFFFFF42;
+_memmap_cacheattr_wt_strict = 0xFFFFFF12;
+_memmap_cacheattr_bp_strict = 0xFFFFFF22;
+_memmap_cacheattr_wb_allvalid = 0x22222242;
+_memmap_cacheattr_wt_allvalid = 0x22222212;
 _memmap_cacheattr_bp_allvalid = 0x22222222;
-_memmap_region_map = 0x00000005;
+_memmap_region_map = 0x00000003;
 PROVIDE(_memmap_cacheattr_reset = _memmap_cacheattr_wb_trapnull);
 
 SECTIONS
 {
-
-  .oemhead.text : ALIGN(4)
-  {
-    _oemhead_text_start = ABSOLUTE(.);
-    KEEP (*(.oemhead.text))
-    . = ALIGN (4);
-    _oemhead_text_end = ABSOLUTE(.);
-  } >iram0_0_seg :iram0_0_phdr
-
-  .oemhead.literal : ALIGN(4)
-  {
-    _oemhead_literal_start = ABSOLUTE(.);
-    *(.oemhead.literal)
-    . = ALIGN (4);
-    _oemhead_literal_end = ABSOLUTE(.);
-    _memmap_seg_iram0_0_end = ALIGN(0x8);
-  } >iram0_0_seg :iram0_0_phdr
-
-
   .ResetVector.text : ALIGN(4)
   {
     _ResetVector_text_start = ABSOLUTE(.);
@@ -123,11 +84,9 @@ SECTIONS
     *(.ResetHandler.literal .ResetHandler.text)
     . = ALIGN (4);
     _ResetHandler_text_end = ABSOLUTE(.);
-    _memmap_seg_iram0_1_end = ALIGN(0x8);
   } >iram0_1_seg :iram0_1_phdr
 
-
-  .WindowVectors.text : ALIGN(4)
+  .WindowVectors.text : ALIGN(256)
   {
     _WindowVectors_text_start = ABSOLUTE(.);
     KEEP (*(.WindowVectors.text))
@@ -139,11 +98,9 @@ SECTIONS
   {
     _Level2InterruptVector_literal_start = ABSOLUTE(.);
     *(.Level2InterruptVector.literal)
-    . = ALIGN (4);
+    . = ALIGN (4); 
     _Level2InterruptVector_literal_end = ABSOLUTE(.);
-    _memmap_seg_iram0_2_end = ALIGN(0x8);
   } >iram0_2_seg :iram0_2_phdr
-
 
   .Level2InterruptVector.text : ALIGN(4)
   {
@@ -159,9 +116,7 @@ SECTIONS
     *(.Level3InterruptVector.literal)
     . = ALIGN (4);
     _Level3InterruptVector_literal_end = ABSOLUTE(.);
-    _memmap_seg_iram0_3_end = ALIGN(0x8);
   } >iram0_3_seg :iram0_3_phdr
-
 
   .Level3InterruptVector.text : ALIGN(4)
   {
@@ -177,9 +132,7 @@ SECTIONS
     *(.DebugExceptionVector.literal)
     . = ALIGN (4);
     _DebugExceptionVector_literal_end = ABSOLUTE(.);
-    _memmap_seg_iram0_4_end = ALIGN(0x8);
   } >iram0_4_seg :iram0_4_phdr
-
 
   .DebugExceptionVector.text : ALIGN(4)
   {
@@ -195,9 +148,7 @@ SECTIONS
     *(.NMIExceptionVector.literal)
     . = ALIGN (4);
     _NMIExceptionVector_literal_end = ABSOLUTE(.);
-    _memmap_seg_iram0_5_end = ALIGN(0x8);
   } >iram0_5_seg :iram0_5_phdr
-
 
   .NMIExceptionVector.text : ALIGN(4)
   {
@@ -213,9 +164,7 @@ SECTIONS
     *(.KernelExceptionVector.literal)
     . = ALIGN (4);
     _KernelExceptionVector_literal_end = ABSOLUTE(.);
-    _memmap_seg_iram0_6_end = ALIGN(0x8);
   } >iram0_6_seg :iram0_6_phdr
-
 
   .KernelExceptionVector.text : ALIGN(4)
   {
@@ -231,9 +180,7 @@ SECTIONS
     *(.UserExceptionVector.literal)
     . = ALIGN (4);
     _UserExceptionVector_literal_end = ABSOLUTE(.);
-    _memmap_seg_iram0_7_end = ALIGN(0x8);
   } >iram0_7_seg :iram0_7_phdr
-
 
   .UserExceptionVector.text : ALIGN(4)
   {
@@ -249,9 +196,7 @@ SECTIONS
     *(.DoubleExceptionVector.literal)
     . = ALIGN (4);
     _DoubleExceptionVector_literal_end = ABSOLUTE(.);
-    _memmap_seg_iram0_8_end = ALIGN(0x8);
   } >iram0_8_seg :iram0_8_phdr
-
 
   .DoubleExceptionVector.text : ALIGN(4)
   {
@@ -260,24 +205,33 @@ SECTIONS
     . = ALIGN (4);
     _DoubleExceptionVector_text_end = ABSOLUTE(.);
   } >iram0_9_seg :iram0_9_phdr
+  
+  _memmap_seg_iram0_0_max = ALIGN(0x8);
 
-  .iram0.text : ALIGN(4)
+  .text : ALIGN(4)
   {
-    _iram0_text_start = ABSOLUTE(.);
-    *(.iram0.literal .iram.literal .iram.text.literal .iram0.text .iram.text)
+    _stext = .;
+    _text_start = ABSOLUTE(.);
+    *(.entry.text)
+    *(.init.literal)
+    KEEP(*(.init))
+    *(.literal.sort.* SORT(.text.sort.*))
+    KEEP (*(.literal.keepsort.* SORT(.text.keepsort.*) .literal.keep.* .text.keep.* .literal.*personality* .text.*personality*))
+    *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+    *(.fini.literal)
+    KEEP(*(.fini))
+    *(.gnu.version)
     . = ALIGN (4);
-    _iram0_text_end = ABSOLUTE(.);
-    _memmap_seg_iram0_9_end = ALIGN(0x8);
-  } >iram0_9_seg :iram0_9_phdr
-
-  _memmap_mem_iram0_max = ABSOLUTE(.);
-
-  .ddr1.rodata : ALIGN(4)
+    _text_end = ABSOLUTE(.);
+    _etext = .;
+  } >ddr1_0_seg :ddr1_0_phdr
+  
+  .rtos.rodata : ALIGN(4)
   {
-    _ddr1_rodata_start = ABSOLUTE(.);
-    *(.ddr1.rodata)
+    _rtos_rodata_start = ABSOLUTE(.);
+    *(.rtos.rodata)
     . = ALIGN (4);
-    _ddr1_rodata_end = ABSOLUTE(.);
+    _rtos_rodata_end = ABSOLUTE(.);
   } >ddr1_0_seg :ddr1_0_phdr
 
   .clib.rodata : ALIGN(4)
@@ -286,14 +240,6 @@ SECTIONS
     *(.clib.rodata)
     . = ALIGN (4);
     _clib_rodata_end = ABSOLUTE(.);
-  } >ddr1_0_seg :ddr1_0_phdr
-
-  .rtos.rodata : ALIGN(4)
-  {
-    _rtos_rodata_start = ABSOLUTE(.);
-    *(.rtos.rodata)
-    . = ALIGN (4);
-    _rtos_rodata_end = ABSOLUTE(.);
   } >ddr1_0_seg :ddr1_0_phdr
 
   .rodata : ALIGN(4)
@@ -337,62 +283,6 @@ SECTIONS
     _rodata_end = ABSOLUTE(.);
   } >ddr1_0_seg :ddr1_0_phdr
 
-  .clib.data : ALIGN(4)
-  {
-    _clib_data_start = ABSOLUTE(.);
-    *(.clib.data)
-    . = ALIGN (4);
-    _clib_data_end = ABSOLUTE(.);
-  } >ddr1_0_seg :ddr1_0_phdr
-
-  .clib.percpu.data : ALIGN(4)
-  {
-    _clib_percpu_data_start = ABSOLUTE(.);
-    *(.clib.percpu.data)
-    . = ALIGN (4);
-    _clib_percpu_data_end = ABSOLUTE(.);
-  } >ddr1_0_seg :ddr1_0_phdr
-
-  .rtos.percpu.data : ALIGN(4)
-  {
-    _rtos_percpu_data_start = ABSOLUTE(.);
-    *(.rtos.percpu.data)
-    . = ALIGN (4);
-    _rtos_percpu_data_end = ABSOLUTE(.);
-  } >ddr1_0_seg :ddr1_0_phdr
-
-  .rtos.data : ALIGN(4)
-  {
-    _rtos_data_start = ABSOLUTE(.);
-    *(.rtos.data)
-    . = ALIGN (4);
-    _rtos_data_end = ABSOLUTE(.);
-  } >ddr1_0_seg :ddr1_0_phdr
-
-  .FSymTab : ALIGN(4)
-  {
-    _FSymTab_start = ABSOLUTE(.);
-    *(.FSymTab)
-    . = ALIGN (4);
-    _FSymTab_end = ABSOLUTE(.);
-  } >ddr1_0_seg :ddr1_0_phdr
-
-  .stubTab : ALIGN(4)
-  {
-    _stubTab_start = ABSOLUTE(.);
-    *(.stubTab)
-    . = ALIGN (4);
-    _stubTab_end = ABSOLUTE(.);
-  } >ddr1_0_seg :ddr1_0_phdr
-
-  .ddr1.data : ALIGN(4)
-  {
-    _ddr1_data_start = ABSOLUTE(.);
-    *(.ddr1.data)
-    . = ALIGN (4);
-    _ddr1_data_end = ABSOLUTE(.);
-  } >ddr1_0_seg :ddr1_0_phdr
-
   .data : ALIGN(4)
   {
     _data_start = ABSOLUTE(.);
@@ -416,39 +306,13 @@ SECTIONS
     . = ALIGN (4);
     _data_end = ABSOLUTE(.);
   } >ddr1_0_seg :ddr1_0_phdr
-
-  .clib.text : ALIGN(4)
+  
+  .clib.data : ALIGN(4)
   {
-    _clib_text_start = ABSOLUTE(.);
-    *(.clib.literal .clib.text)
+    _clib_data_start = ABSOLUTE(.);
+    *(.clib.data)
     . = ALIGN (4);
-    _clib_text_end = ABSOLUTE(.);
-  } >ddr1_0_seg :ddr1_0_phdr
-
-  .rtos.text : ALIGN(4)
-  {
-    _rtos_text_start = ABSOLUTE(.);
-    *(.rtos.literal .rtos.text)
-    . = ALIGN (4);
-    _rtos_text_end = ABSOLUTE(.);
-  } >ddr1_0_seg :ddr1_0_phdr
-
-  .text : ALIGN(4)
-  {
-    _stext = .;
-    _text_start = ABSOLUTE(.);
-    *(.entry.text)
-    *(.init.literal)
-    KEEP(*(.init))
-    *(.literal.sort.* SORT(.text.sort.*))
-    KEEP (*(.literal.keepsort.* SORT(.text.keepsort.*) .literal.keep.* .text.keep.* .literal.*personality* .text.*personality*))
-    *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
-    *(.fini.literal)
-    KEEP(*(.fini))
-    *(.gnu.version)
-    . = ALIGN (4);
-    _text_end = ABSOLUTE(.);
-    _etext = .;
+    _clib_data_end = ABSOLUTE(.);
   } >ddr1_0_seg :ddr1_0_phdr
 
   .bss (NOLOAD) : ALIGN(8)
@@ -470,23 +334,18 @@ SECTIONS
     *(.bss.*)
     *(.gnu.linkonce.b.*)
     *(COMMON)
-    *(.clib.percpu.bss)
     *(.clib.bss)
+    *(.clib.percpu.bss)
     *(.rtos.percpu.bss)
     *(.rtos.bss)
-    *(.ddr1.bss)
+    *(.dram0.bss)
     . = ALIGN (8);
     _bss_end = ABSOLUTE(.);
     _end = ALIGN(0x8);
     PROVIDE(end = ALIGN(0x8));
     _stack_sentry = ALIGN(0x8);
-    _memmap_seg_ddr1_0_end = ALIGN(0x8);
-  } >ddr1_0_seg :ddr1_0_bss_phdr
-
-  PROVIDE(__stack = 0x42100000);
-  _heap_sentry = 0x42100000;
-
-  _memmap_mem_ddr1_max = ABSOLUTE(.);
+    _memmap_seg_dram0_0_end = ALIGN(0x8);
+  } >ddr1_0_seg :ddr1_0_phdr
 
   .debug  0 :  { *(.debug) }
   .line  0 :  { *(.line) }
@@ -526,5 +385,7 @@ SECTIONS
   {
     KEEP (*(.debug.xt.callgraph .debug.xt.callgraph.* .gnu.linkonce.xt.callgraph.*))
   }
+   PROVIDE(__stack = 0x37d00000);
+  _heap_sentry = 0x37d00000;
 }
 

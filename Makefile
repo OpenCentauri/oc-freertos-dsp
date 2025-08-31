@@ -25,6 +25,7 @@ APP := $(BUILDDIR)/$(APP_NAME).elf
 
 IFLAGS := -I ./include
 IFLAGS += -I ./arch
+IFLAGS += -I ./arch/include
 IFLAGS += -I ./src
 IFLAGS += -I ./kernel/portable
 IFLAGS += -I ./include/freertos
@@ -68,6 +69,12 @@ STARTUP_SRC += arch/crt1
 STARTUP_SRC += arch/intlevel-set
 STARTUP_SRC += arch/board-init
 STARTUP_SRC += arch/rtos-help
+#Kconfig*  Makefile  cpufreq.c  cpufreq.h  include/  init-sun8iw20.c*  lsp/  mmu.c  orig/
+#STARTUP_SRC += arch/init-sun8iw20
+#STARTUP_SRC += arch/cpufreq
+#STARTUP_SRC += arch/mmu
+
+OEM_SRC += oemhead/oemhead
 
 KERNEL_SRC := kernel/FreeRTOS/event_groups
 KERNEL_SRC += kernel/FreeRTOS/list
@@ -88,6 +95,7 @@ KERNEL_SRC += kernel/portable/xtensa_overlay_os_hook
 KERNEL_SRC += kernel/portable/xtensa_vectors
 
 SRC := $(APP_SRC)
+SRC += $(OEM_SRC)
 SRC += $(STARTUP_SRC)
 SRC += $(KERNEL_SRC)
 SRC += $(BENCHMARK_SRC)
@@ -107,6 +115,7 @@ builddir:
 	$(Q)$(MKDIR) $(BUILDDIR)
 	$(Q)$(MKDIR) $(BUILDDIR)/src
 	$(Q)$(MKDIR) $(BUILDDIR)/arch
+	$(Q)$(MKDIR) $(BUILDDIR)/oemhead
 	$(Q)$(MKDIR) $(BUILDDIR)/kernel/FreeRTOS
 	$(Q)$(MKDIR) $(BUILDDIR)/kernel/portable
 	$(Q)$(MKDIR) $(BUILDDIR)/kernel/MemMang
@@ -116,7 +125,7 @@ builddir:
 	$(Q)$(MKDIR) $(BUILDDIR)/benchmark/coremark/xtensa
 	$(Q)$(MKDIR) $(BUILDDIR)/output
 
-$(APP): $(LIB_OBJS) 
+$(APP): include/version.h $(LIB_OBJS)
 	$(Q)echo [LD] LINKING $@
 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) $(LIB_OBJS) $(LIBS) -o $(APP)
 	$(Q)echo [SP] STRIP $@
@@ -141,3 +150,34 @@ $(BUILDDIR)/%.o: %.c
 	
 clean:
 	$(Q)rm -rf $(BUILDDIR)
+
+#create head file
+include/version.h:
+	$(Q)$(call filechk,version)
+
+define filechk
+	$(Q)set -e;                             \
+	echo '  CHK     $@';                    \
+	mkdir -p $(dir $@);                     \
+	$(filechk_$(1)) > $@.tmp;               \
+	if [ -r $@ ] && cmp -s $@ $@.tmp; then  \
+		rm -f $@.tmp;                       \
+	else                                    \
+		echo '  UPD     $@';                \
+		mv -f $@.tmp $@;                    \
+	fi
+endef
+
+define filechk_version
+(echo "/*";\
+	echo " * THIS IS CREATE WITH VERSION CHK";\
+	echo " * DO NOT CHANGE IT MANUAL";\
+	echo " */";\
+	echo ;\
+	echo "#ifndef _SUB_VER_";\
+	echo "#define _SUB_VER_";\
+	echo ;\
+	echo "#define SUB_VER \"`scripts/setlocalversion`\"";\
+	echo ;\
+	echo "#endif /* _SUB_VER_ */";)
+endef
