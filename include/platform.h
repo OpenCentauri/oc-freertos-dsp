@@ -38,7 +38,7 @@
  * msgbox 1  cpu->dsp  cpu write
  */
 
-#define SUNXI_MSGBOX_MAX_CHANNEL 4
+#define SUNXI_MSGBOX_MAX_CHANNEL 2
 #define SUNXI_MSGBOX_MAX_QUEUE 8
 
 #define SUNXI_MSGBOX_RD_IRQ_ENABLE_REG \
@@ -76,7 +76,7 @@
 #define TIMER1_IRQ 1
 #define MSGBOX_IRQ 3
 
-#define MSGBOX_CHANNLE 3
+#define MSGBOX_CHANNELS 2
 
 extern void dsp_msgbox_init(void (*rxcb)(uint32_t, uint32_t));
 extern void dsp_msgbox_channel_send(uint32_t ch, uint8_t *bf, uint32_t len);

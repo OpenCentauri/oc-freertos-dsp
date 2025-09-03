@@ -16,6 +16,9 @@
 #include "task.h"
 
 typedef void (*msgbox_rxcb)(uint32_t, uint32_t);
+//static uint8_t msgbuf[65536];
+//static uint32_t msgbuf_len;
+//                msgbuf[i] = dat;
 
 // HiFI4 DSP-viewed address offset translate to host cpu viewwed @ua1arn
 static ptrdiff_t xlate_dsp2mpu(ptrdiff_t a) {
@@ -59,6 +62,7 @@ static int sunxi_msgbox_interrupt(int dummy, void *args) {
             }
             SUNXI_MSGBOX_RD_IRQ_CLR_PENDING(i);
         }
+        //msgbuf_len = i+1;
     }
     return 0;
 }
@@ -67,7 +71,7 @@ void dsp_msgbox_init(void (*rxcb)(uint32_t, uint32_t)) {
     xt_set_interrupt_handler(MSGBOX_IRQ, (xt_handler) sunxi_msgbox_interrupt,
                              (void *) rxcb);
     xt_ints_on(1 << MSGBOX_IRQ);
-    SUNXI_MSGBOX_RD_IRQ_ENABLE(MSGBOX_CHANNLE);
+    SUNXI_MSGBOX_RD_IRQ_ENABLE(MSGBOX_CHANNELS);
 }
 
 static void msgbox_channel_send_data(uint32_t ch, uint32_t data) {

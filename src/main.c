@@ -27,14 +27,16 @@ extern void coremark_main(void);
  */
 void vTaskMain(void *pvParameters) {
     (void) pvParameters;
-    dsp_msgbox_init(NULL);
+    dsp_msgbox_init(0x00);
     vTaskDelay(500);
     dhry_main(10000000);
     linpack_main();
     coremark_main();
     uint32_t sdata = 0;
+    char* msg = "Hello, World!\n";
     while (1) {
-        printf("task led run on task\n");
+        dsp_msgbox_channel_send(0x02, (uint8_t *)msg, strlen(msg));
+        //printf("task led run on task\n");
         sdata++;
         vTaskDelay(500);
     }
