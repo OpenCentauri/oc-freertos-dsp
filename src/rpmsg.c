@@ -151,11 +151,11 @@ int rpmsg_send(rpmsg_endpoint_t *ept, uint32_t dst_addr, void *data, uint32_t le
 
     // Send header first
     // Assuming channel 1 for RPMSG communication based on DTS
-    dsp_msgbox_channel_send(1, (uint8_t *)&hdr, sizeof(rpmsg_hdr_t));
+    dsp_msgbox_channel_send(0, (uint8_t *)&hdr, sizeof(rpmsg_hdr_t));
 
     // Send payload
     if (len > 0) {
-        dsp_msgbox_channel_send(1, (uint8_t *)data, len);
+        dsp_msgbox_channel_send(0, (uint8_t *)data, len);
     }
 
     printf("RPMSG: Sent message from 0x%08x to 0x%08x, len=%lu\n", hdr.src, hdr.dst, (unsigned long)hdr.len);
@@ -197,11 +197,29 @@ void dsp_msgbox_init(void (*rxcb)(uint32_t, uint32_t)) {
     xt_ints_on(1 << MSGBOX_IRQ);
     SUNXI_MSGBOX_RD_IRQ_ENABLE(MSGBOX_CHANNELS);
 
+    // Clear any pending write interrupts on CPU->DSP channel (channel 1)
+    writel(SUNXI_MSGBOX_WR_IRQ_STATUS_REG, (1 << (2 * 1)));
+
+    // Enable clock and deassert reset for both CPU and DSP message boxes
+    // MSGBOX_BGR_REG is at CCU_BASE + 0x071C
+    // Bits: 17 (MSGBOX1_RST), 1 (MSGBOX1_GATING), 16 (MSGBOX0_RST), 0 (MSGBOX0_GATING)
+    #define CCU_BASE 0x02001000
+    #define MSGBOX_BGR_REG (CCU_BASE + 0x071C)
+    writel(MSGBOX_BGR_REG, readl(MSGBOX_BGR_REG) | ( (1 << 17) | (1 << 1) | (1 << 16) | (1 << 0) ) );
+
+    // Add a small delay after enabling clock and deasserting reset
+    volatile int i;
+    for (i = 0; i < 100000; i++); // Busy-wait for a short period
+
+    // Configure channel 0 as RX and TX for the DSP (coprocessor)
+    // This corresponds to CTRL_REG(0), CTRL_RX(0) and CTRL_TX(0) in the Linux driver
+    // Use SUNXI_MSGBOX_ARM_BASE as the Linux driver is looking at this base address
+    writel(SUNXI_MSGBOX_ARM_BASE + 0x0000, readl(SUNXI_MSGBOX_ARM_BASE + 0x0000) | (0x01 | 0x10));
+
     // Initialize RPMSG framework
     rpmsg_init();
 
-    // Create the "amp" endpoint with a dummy address for now
-    amp_endpoint = rpmsg_create_endpoint("sunxi,dsp-msgbox", 0x01, amp_rx_callback, NULL);
+    
 }
 
 static void msgbox_channel_send_data(uint32_t ch, uint32_t data) {
