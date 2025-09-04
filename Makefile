@@ -53,7 +53,7 @@ LDFLAGS += -Wl,--script link.ld
 LIBS =  -L ./lib/  -lxtutil  -lhandler-reset -lc -lgloss -lhal -lm -lgcc -lc
 
 APP_SRC := src/main
-APP_SRC += src/msgbox
+APP_SRC += src/rpmsg
 
 BENCHMARK_SRC := benchmark/linpack-pc
 BENCHMARK_SRC += benchmark/dhry_1
