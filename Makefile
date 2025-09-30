@@ -48,7 +48,8 @@ DFLAGS += -DXTUTIL_NO_OVERRIDE
 DFLAGS += -DMAIN_HAS_NOARGC
 DFLAGS += -DPERFORMANCE_RUN=1 -DITERATIONS=23000
 # Added for OpenCentauri dsp0 port
-DFLAGS += -DCONFIG_KERNEL_FREERTOS -DCONFIG_ARCH_SUN8IW20
+DFLAGS += -DCONFIG_KERNEL_FREERTOS -DCONFIG_ARCH_SUN8IW20 -DCONFIG_OEMHEAD
+DFLAGS += -DCONFIG_DRIVERS_SUNXI_CLK
 
 CFLAGS  := -Wa,--longcalls -static -O2  -Wall -mtext-section-literals  -fno-inline-functions
 CFLAGS  += -ffunction-sections -fdata-sections  -mlongcalls  $(DFLAGS) $(IFLAGS)
@@ -113,8 +114,13 @@ APP_SRC += src/klipper_r528/board/watchdog
 
 # Added for OpenCentauri dsp0 port
 HAL_SRC :=
+# GPIO HAL Objects
 HAL_SRC += hal/gpio/hal_gpio
-HAL_SRC += hal/gpio/sun8iw20/gpio-sun8iw20.o
+HAL_SRC += hal/gpio/sun8iw20/gpio-sun8iw20
+# CCMU HAL Objects (Clock)
+HAL_SRC += hal/ccmu/hal_clk
+HAL_SRC += hal/ccmu/hal_reset
+# MORE TO DO HERE CLOCK SUBDIRS BUT SKIPPING FOR NOW
 
 BENCHMARK_SRC := benchmark/linpack-pc
 BENCHMARK_SRC += benchmark/dhry_1
@@ -176,6 +182,13 @@ all: clean builddir $(APP)
 builddir:
 	$(Q)$(MKDIR) $(BUILDDIR)
 	$(Q)$(MKDIR) $(BUILDDIR)/src
+	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528
+	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/board
+	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/bus
+	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/generic
+	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/hal_call
+	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/printer
+	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/ui
 	$(Q)$(MKDIR) $(BUILDDIR)/arch
 	$(Q)$(MKDIR) $(BUILDDIR)/oemhead
 	$(Q)$(MKDIR) $(BUILDDIR)/kernel/FreeRTOS
