@@ -48,7 +48,7 @@ DFLAGS += -DXTUTIL_NO_OVERRIDE
 DFLAGS += -DMAIN_HAS_NOARGC
 DFLAGS += -DPERFORMANCE_RUN=1 -DITERATIONS=23000
 # Added for OpenCentauri dsp0 port
-DFLAGS += -DCONFIG_KERNEL_FREERTOS
+DFLAGS += -DCONFIG_KERNEL_FREERTOS -DCONFIG_ARCH_SUN8IW20
 
 CFLAGS  := -Wa,--longcalls -static -O2  -Wall -mtext-section-literals  -fno-inline-functions
 CFLAGS  += -ffunction-sections -fdata-sections  -mlongcalls  $(DFLAGS) $(IFLAGS)
