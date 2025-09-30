@@ -24,11 +24,18 @@ BUILDDIR = ./build
 APP := $(BUILDDIR)/$(APP_NAME).elf
 
 IFLAGS := -I ./include
+
+# Added for OpenCentauri dsp0 port
 IFLAGS += -I ./include/hal
 IFLAGS += -I ./include/osal
+
 IFLAGS += -I ./arch
 IFLAGS += -I ./arch/include
 IFLAGS += -I ./src
+
+# Added for OpenCentauri dsp0 port
+IFLAGS += -I ./hal
+
 IFLAGS += -I ./kernel/portable
 IFLAGS += -I ./include/freertos
 IFLAGS += -I ./include/freertos/private
@@ -104,6 +111,11 @@ APP_SRC += src/klipper_r528/board/i2c
 APP_SRC += src/klipper_r528/board/spi
 APP_SRC += src/klipper_r528/board/watchdog
 
+# Added for OpenCentauri dsp0 port
+HAL_SRC :=
+HAL_SRC += hal/gpio/hal_gpio
+HAL_SRC += hal/gpio/sun8iw20/gpio-sun8iw20.o
+
 BENCHMARK_SRC := benchmark/linpack-pc
 BENCHMARK_SRC += benchmark/dhry_1
 BENCHMARK_SRC += benchmark/dhry_2
@@ -144,6 +156,7 @@ KERNEL_SRC += kernel/portable/xtensa_overlay_os_hook
 KERNEL_SRC += kernel/portable/xtensa_vectors
 
 SRC := $(APP_SRC)
+SRC += $(HAL_SRC)
 SRC += $(OEM_SRC)
 SRC += $(STARTUP_SRC)
 SRC += $(KERNEL_SRC)
