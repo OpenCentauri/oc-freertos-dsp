@@ -53,7 +53,51 @@ LDFLAGS += -Wl,--script link.ld
 LIBS =  -L ./lib/  -lxtutil  -lhandler-reset -lc -lgloss -lhal -lm -lgcc -lc
 
 APP_SRC := src/main
-APP_SRC += src/rpmsg
+
+APP_SRC += src/klipper_r528/bus/msgboxx
+APP_SRC += src/klipper_r528/bus/share_space
+APP_SRC += src/klipper_r528/bus/usb_bulk
+APP_SRC += src/klipper_r528/bus/uart
+APP_SRC += src/klipper_r528/hal_call/adccmds
+APP_SRC += src/klipper_r528/hal_call/endstop
+APP_SRC += src/klipper_r528/hal_call/gpiocmds
+APP_SRC += src/klipper_r528/hal_call/i2ccmds
+APP_SRC += src/klipper_r528/hal_call/initial_pins
+APP_SRC += src/klipper_r528/hal_call/pwmcmds
+APP_SRC += src/klipper_r528/hal_call/sensor_adxl345
+APP_SRC += src/klipper_r528/hal_call/spi_software
+APP_SRC += src/klipper_r528/hal_call/spicmds
+APP_SRC += src/klipper_r528/hal_call/thermocouple
+APP_SRC += src/klipper_r528/hal_call/tmcuart
+
+APP_SRC += src/klipper_r528/printer/basecmd
+APP_SRC += src/klipper_r528/printer/command
+APP_SRC += src/klipper_r528/printer/compile_time_request
+APP_SRC += src/klipper_r528/printer/debugcmds
+APP_SRC += src/klipper_r528/printer/pulse_counter
+APP_SRC += src/klipper_r528/printer/scheder
+APP_SRC += src/klipper_r528/printer/stepper
+APP_SRC += src/klipper_r528/printer/trsync
+APP_SRC += src/klipper_r528/printer/neopixel
+APP_SRC += src/klipper_r528/ui/buttons
+APP_SRC += src/klipper_r528/ui/lcd_hd44780
+APP_SRC += src/klipper_r528/ui/lcd_st7920
+
+APP_SRC += src/klipper_r528/generic/alloc
+APP_SRC += src/klipper_r528/generic/armcm_reset
+APP_SRC += src/klipper_r528/generic/armcm_timer
+APP_SRC += src/klipper_r528/generic/armcm_irq
+APP_SRC += src/klipper_r528/generic/crc16_ccitt
+APP_SRC += src/klipper_r528/generic/usb_cdc
+
+APP_SRC += src/klipper_r528/board/adc
+APP_SRC += src/klipper_r528/board/chipid
+APP_SRC += src/klipper_r528/board/gpio
+APP_SRC += src/klipper_r528/board/hard_pwm
+APP_SRC += src/klipper_r528/board/i2c
+
+APP_SRC += src/klipper_r528/board/spi
+APP_SRC += src/klipper_r528/board/watchdog
 
 BENCHMARK_SRC := benchmark/linpack-pc
 BENCHMARK_SRC += benchmark/dhry_1
