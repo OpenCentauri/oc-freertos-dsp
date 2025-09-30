@@ -1,0 +1,5 @@
+config LSP_DIR
+	string
+	default "default" if (!SIM_PLATFORM && CORE_DSP0 && LSP_NORMAL_START)
+	default "jtag" if (!SIM_PLATFORM && CORE_DSP0 && LSP_JTAG_START)
+	default "perf_mem" if (!SIM_PLATFORM && CORE_DSP0 && LSP_PERF_MEM_TEST)

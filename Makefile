@@ -24,6 +24,8 @@ BUILDDIR = ./build
 APP := $(BUILDDIR)/$(APP_NAME).elf
 
 IFLAGS := -I ./include
+IFLAGS += -I ./include/hal
+IFLAGS += -I ./include/osal
 IFLAGS += -I ./arch
 IFLAGS += -I ./arch/include
 IFLAGS += -I ./src
@@ -38,6 +40,8 @@ DFLAGS := -DXT_BOARD  -DXT_TIMER_INDEX=0 -DXT_USE_SWPRI -DSTANDALONE=1
 DFLAGS += -DXTUTIL_NO_OVERRIDE 
 DFLAGS += -DMAIN_HAS_NOARGC
 DFLAGS += -DPERFORMANCE_RUN=1 -DITERATIONS=23000
+# Added for OpenCentauri dsp0 port
+DFLAGS += -DCONFIG_KERNEL_FREERTOS
 
 CFLAGS  := -Wa,--longcalls -static -O2  -Wall -mtext-section-literals  -fno-inline-functions
 CFLAGS  += -ffunction-sections -fdata-sections  -mlongcalls  $(DFLAGS) $(IFLAGS)
@@ -52,6 +56,7 @@ LDFLAGS += -Wl,--script link.ld
 
 LIBS =  -L ./lib/  -lxtutil  -lhandler-reset -lc -lgloss -lhal -lm -lgcc -lc
 
+# Added for OpenCentauri dsp0 port
 APP_SRC := src/main
 
 APP_SRC += src/klipper_r528/bus/msgboxx
