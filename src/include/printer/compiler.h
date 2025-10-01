@@ -33,9 +33,8 @@
 #define ALIGN_DOWN(x,a)         ((x) & ~((typeof(x))(a)-1))
 
 #ifndef container_of
-#define container_of(ptr, type, member) ({                      \
-        const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
-        (type *)( (char *)__mptr - offsetof(type,member) );})
+#define container_of(ptr, type, member) \
+    ((type *)((char *)(ptr) - offsetof(type, member)))
 #endif
 
 #define __stringify_1(x)        #x
