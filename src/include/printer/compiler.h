@@ -28,7 +28,10 @@
 
 
 
-#define ALIGN(x,a)              __ALIGN_MASK(x,(typeof(x))(a)-1)
+//#define ALIGN(x,a)              __ALIGN_MASK(x,(typeof(x))(a)-1)
+// OpenCentauri: Simplified this macro again! GCC was choking on it...
+#define ALIGN(x,a)              __ALIGN_MASK(x,(a)-1)
+
 #define __ALIGN_MASK(x,mask)    (((x)+(mask))&~(mask))
 #define ALIGN_DOWN(x,a)         ((x) & ~((typeof(x))(a)-1))
 
