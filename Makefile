@@ -31,6 +31,7 @@ IFLAGS += -I ./include/osal
 
 IFLAGS += -I ./arch
 IFLAGS += -I ./arch/include
+IFLAGS += -I ./arch/sun8iw20/include
 IFLAGS += -I ./src
 
 # Added for OpenCentauri dsp0 port
