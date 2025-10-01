@@ -44,13 +44,69 @@ IFLAGS += -I ./benchmark
 IFLAGS += -I ./benchmark/coremark
 IFLAGS += -I ./benchmark/coremark/xtensa
 
+# Open-source FreeRTOS Default Defines
 DFLAGS := -DXT_BOARD  -DXT_TIMER_INDEX=0 -DXT_USE_SWPRI -DSTANDALONE=1 
 DFLAGS += -DXTUTIL_NO_OVERRIDE 
 DFLAGS += -DMAIN_HAS_NOARGC
 DFLAGS += -DPERFORMANCE_RUN=1 -DITERATIONS=23000
+
 # Added for OpenCentauri dsp0 port
-DFLAGS += -DCONFIG_KERNEL_FREERTOS -DCONFIG_ARCH_SUN8IW20 -DCONFIG_OEMHEAD
-DFLAGS += -DCONFIG_DRIVERS_SUNXI_CLK -DCONFIG_CORE_DSP0
+# Target Options
+DFLAGS += -DCONFIG_ARCH_SUN8IW20 -DCONFIG_ARCH_PLATFORM="sun8iw20" -DCONFIG_EVB_PLATFORM
+DFLAGS += -DCONFIG_EVB_PLATFORM -DCONFIG_CORE_DSP0 -DCONFIG_CORE_ID="dsp0" 
+DFLAGS += -DCONFIG_LSP_NORMAL_START -DCONFIG_LSP_DIR="default"
+# Kernel Options
+DFLAGS += -DCONFIG_KERNEL_FREERTOS -DCONFIG_KERNEL_XTENSA_V1_7
+DFLAGS += -DCONFIG_KERNEL_VERSION_DIR="FreeRTOS_xtensa_v1.7" -DCONFIG_MEMMANG_HEAP_4
+DFLAGS += -DCONFIG_PORT_XCC_XTENSA -DCONFIG_PORT_ARCH_DIR="xtensa" -DCONFIG_PORT_XEA2
+# Clock Devices
+DFLAGS += -DCONFIG_DRIVERS_SUNXI_CLK
+# CCMU Devices
+DFLAGS += -DCONFIG_DRIVERS_CCMU -DCONFIG_DRIVERS_SUNXI_CCU
+# UART Devices
+DFLAGS += -DCONFIG_DRIVERS_UART
+# Board related device drivers
+DFLAGS += -DCONFIG_DRIVERS_BOARD
+# HAL OSAL API
+DFLAGS += -DCONFIG_HAL_OSAL
+# AW Sound Compenents Only For Dsp
+DFLAGS += -DCONFIG_COMPONENTS_AW_ALSA_RPAF
+DFLAGS += -DCONFIG_COMPONENTS_AW_ALSA_RPAF_COMPONENT
+DFLAGS += -DCONFIG_COMPONENTS_AW_ALSA_RPAF_REMOTE_AMP=0
+DFLAGS += -DCONFIG_COMPONENTS_AW_ALSA_RPAF_READ_CH=1
+DFLAGS += -DCONFIG_COMPONENTS_AW_ALSA_RPAF_WRITE_CH=1
+DFLAGS += -DCONFIG_OEMHEAD
+# Backtrace Support
+DFLAGS += -DCONFIG_DEBUG_BACKTRACE
+# Linux Debug Support
+DFLAGS += -DCONFIG_PM_CLIENT_DSP_WAITI
+# DSPFREQ option features
+DFLAGS += -DCONFIG_AW_DSPFREQ
+# dump reg option features
+DFLAGS += -DCONFIG_AW_JTAG_DEBUG
+DFLAGS += -DCONFIG_MEMTESTER
+# Performance Testing
+DFLAGS += -DCONFIG_AW_PERF_MEM_ACC
+# Miscellaneous Support
+DFLAGS += -DCONFIG_BITOPS_FLS
+# Thirdparty components
+DFLAGS += -DCONFIG_COMPONENTS_THIRDPARTY
+# Xtensa components
+DFLAGS += -DCONFIG_COMPONENTS_XTENSA
+DFLAGS += -DCONFIG_COMPONENTS_XTENSA_LIBGLOSS
+# FreeRTOS components
+DFLAGS += -DCONFIG_COMPONENTS_FREERTOS
+DFLAGS += -DCONFIG_COMPONENTS_FREERTOS_CLI
+# Supported commands
+DFLAGS += -DCONFIG_FREERTOS_CLI_CMD_MEM_RW
+DFLAGS += -DCONFIG_FREERTOS_CLI_CMD_FREE
+# Algorithm common
+DFLAGS += -DCONFIG_COMPONENTS_ALGO_COMMON
+DFLAGS += -DCONFIG_COMPONENTS_ALGO_GENERATE
+DFLAGS += -DCONFIG_COMPONENTS_MSGBOX_DEMO
+# Projects options
+DFLAGS += -DCONFIG_PROJECT_R528
+DFLAGS += -DCONFIG_PROJECT_DIR="r528"
 
 CFLAGS  := -Wa,--longcalls -static -O2  -Wall -mtext-section-literals  -fno-inline-functions
 CFLAGS  += -ffunction-sections -fdata-sections  -mlongcalls  $(DFLAGS) $(IFLAGS)
@@ -115,12 +171,20 @@ APP_SRC += src/klipper_r528/board/watchdog
 
 # Added for OpenCentauri dsp0 port
 HAL_SRC :=
+# RTC HAL Objects
+HAL_SRC += hal/rtc/hal_rtc
+HAL_SRC += hal/rtc/rtc-lib
 # GPIO HAL Objects
 HAL_SRC += hal/gpio/hal_gpio
 HAL_SRC += hal/gpio/sun8iw20/gpio-sun8iw20
 # CCMU HAL Objects (Clock)
 HAL_SRC += hal/ccmu/hal_clk
 HAL_SRC += hal/ccmu/hal_reset
+# MsgBox HAL Objects
+HAL_SRC += hal/msgbox/msgbox_amp/msgbox_amp
+HAL_SRC += hal/msgbox/msgbox_sx/hal_msgbox_sx
+HAL_SRC += hal/msgbox/msgbox_sx/msgbox_sx
+HAL_SRC += hal/msgbox/msgbox_sx/msgbox_adapt
 # MORE TO DO HERE CLOCK SUBDIRS BUT SKIPPING FOR NOW
 
 BENCHMARK_SRC := benchmark/linpack-pc
@@ -189,7 +253,10 @@ builddir:
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/printer
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/ui
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/gpio/sun8iw20
+	$(Q)$(MKDIR) $(BUILDDIR)/hal/rtc
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/ccmu
+	$(Q)$(MKDIR) $(BUILDDIR)/hal/msgbox/msgbox_amp
+	$(Q)$(MKDIR) $(BUILDDIR)/hal/msgbox/msgbox_sx
 	$(Q)$(MKDIR) $(BUILDDIR)/arch
 	$(Q)$(MKDIR) $(BUILDDIR)/oemhead
 	$(Q)$(MKDIR) $(BUILDDIR)/kernel/FreeRTOS
