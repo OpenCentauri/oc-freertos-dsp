@@ -44,9 +44,12 @@
 #define __PASTE(a,b) ___PASTE(a,b)
 
 #define DIV_ROUND_UP(n,d) (((n) + (d) - 1) / (d))
-#define DIV_ROUND_CLOSEST(x, divisor)({                 \
+
+/*#define DIV_ROUND_CLOSEST(x, divisor)({                 \
             typeof(divisor) __divisor = divisor;        \
             (((x) + ((__divisor) / 2)) / (__divisor));  \
-        })
+        })*/
+// OpenCentauri: Simplified this macro, our gcc was rejecting it
+#define DIV_ROUND_CLOSEST(x, divisor)      ((((x) + ((divisor) / 2)) / (divisor)))
 
 #endif // compiler.h
