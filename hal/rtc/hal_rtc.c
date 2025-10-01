@@ -47,13 +47,13 @@ static struct hal_rtc_data_year data_year_param =
 static hal_rtc_status_t hal_rtc_clk_init(struct hal_rtc_dev *rtc)
 {
 #if defined(CONFIG_SOC_SUN20IW1)
-    hal_clk_type_t clk_r_type = HAL_SUNXI_R_CCU;
+    hal_ccu_type_t clk_r_type = HAL_SUNXI_R_CCU;
     hal_clk_id_t rtc_clk_r_id = CLK_R_AHB_BUS_RTC;
 
-    hal_clk_type_t clk_rtc1k_type = HAL_SUNXI_RTC_CCU;
+    hal_ccu_type_t clk_rtc1k_type = HAL_SUNXI_RTC_CCU;
     hal_clk_id_t rtc_clk_rtc1k_id = CLK_RTC_1K;
 
-    hal_clk_type_t clk_rtcspi_type = HAL_SUNXI_RTC_CCU;
+    hal_ccu_type_t clk_rtcspi_type = HAL_SUNXI_RTC_CCU;
     hal_clk_id_t rtc_clk_rtcspi_id = CLK_RTC_SPI;
 
     hal_reset_type_t reset_type = HAL_SUNXI_RESET;

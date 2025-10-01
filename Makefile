@@ -260,7 +260,7 @@ builddir:
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/gpio/sun8iw20
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/rtc
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/ccmu
-	$(Q)$(MKDIR) $(BUILDDIR)/hal/ccmu/sunxi_ng
+	$(Q)$(MKDIR) $(BUILDDIR)/hal/ccmu/sunxi-ng
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/msgbox/msgbox_amp
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/msgbox/msgbox_sx
 	$(Q)$(MKDIR) $(BUILDDIR)/arch

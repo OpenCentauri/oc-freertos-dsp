@@ -88,15 +88,14 @@ typedef enum
 * Enum hal_clk_type_t
 * @Description: This enum defines the type of Clock
 *************************************************************************************************/
-// OpenCentauri: Commented out to resolve conflicting type definition
-// typedef enum
-// {
-//     HAL_SUNXI_FIXED_CCU = 0,
-//     HAL_SUNXI_RTC_CCU,
-//     HAL_SUNXI_CCU,
-//     HAL_SUNXI_R_CCU,
-//     HAL_SUNXI_CCU_NUMBER,
-// } hal_clk_type_t;
+typedef enum
+{
+    HAL_SUNXI_FIXED_CCU = 0,
+    HAL_SUNXI_RTC_CCU,
+    HAL_SUNXI_CCU,
+    HAL_SUNXI_R_CCU,
+    HAL_SUNXI_CCU_NUMBER,
+} hal_ccu_type_t;
 
 typedef u32 hal_clk_id_t;
 
