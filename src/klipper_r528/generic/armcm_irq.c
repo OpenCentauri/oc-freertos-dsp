@@ -56,7 +56,9 @@ void irq_wait(void)
 {
     //  asm("sei\n    nop\n    cli" : : : "memory");
     XTOS_SET_INTLEVEL(0);  
-    asm("nop\n    nop\n    nop" : : : "memory");
+    // OpenCentauri: Added __asm__ __volatile__ to make this look like other inline asm, fixes error
+    // asm("nop\n    nop\n    nop" : : : "memory");
+    __asm__ __volatile__("nop\n    nop\n    nop" : : : "memory");
     XTOS_SET_INTLEVEL(XCHAL_EXCM_LEVEL);  
 }
 
