@@ -130,4 +130,46 @@ static inline void *MSGBOX_MSG_REG(int m, int n, int p)
 #define RST_MSGBOX RST_BUS_MSGBOX1
 #define CLK_MSGBOX CLK_BUS_MSGBOX1
 
+// OpenCentauri: Pulling in header definitions from other places, hopefully this works
+/* config for DSP */
+#if defined(CONFIG_CORE_DSP0)
+#include <interrupt.h>
+#include <hal_prcm.h>
+
+#define MSGBOX0_CPU_DSP0	0x03003000
+#define MSGBOX1_CPU_DSP1	0x03008000
+#define MSGBOXR_DSP0_DSP1	0x07092000
+
+#if defined(CONFIG_CORE_DSP0)	/* DSP0 */
+#define MSGBOX_CPU_DSP		MSGBOX0_CPU_DSP0
+#define MSGBOX_DSP_DSP		MSGBOXR_DSP0_DSP1
+
+#define MSGBOX_CPU_DSP_USER	(1)
+#define MSGBOX_DSP_DSP_USER	(0)
+
+#elif defined(CONFIG_CORE_DSP1)	/* DSP1 */
+#define MSGBOX_CPU_DSP		MSGBOX1_CPU_DSP1
+#define MSGBOX_DSP_DSP		MSGBOXR_DSP0_DSP1
+
+#define MSGBOX_CPU_DSP_USER	(1)
+#define MSGBOX_DSP_DSP_USER	(1)
+
+#else				/* error */
+#error "must select dsp core"
+#endif
+
+/* for prcm and ccmu compatibility */
+#define HAL_CLK_PERIPH_MSGBOX0	CCU_MOD_CLK_MSGBOX0
+#define HAL_CLK_PERIPH_MSGBOX1	CCU_MOD_CLK_MSGBOX1
+#define HAL_CLK_PERIPH_MSGBOXR	CCU_MOD_CLK_MSGBOXR
+#endif /* CONFIG_CORE_DSP0 */
+
+#if defined(CONFIG_CORE_DSP0)
+#define SUNXI_DSP_IRQ_R_MSGBOX_DSP	3
+#define SUNXI_DSP_IRQ_MSGBOX0_DSP	4
+#else
+#define SUNXI_DSP_IRQ_R_MSGBOX_DSP	3
+#define SUNXI_DSP_IRQ_MSGBOX0_DSP	4
+#endif
+
 #endif /* __MSGBOX_SUN8IW20_H */
