@@ -182,14 +182,14 @@ all: clean builddir $(APP)
 
 builddir:
 	$(Q)$(MKDIR) $(BUILDDIR)
-	$(Q)$(MKDIR) $(BUILDDIR)/src
-	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/board
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/bus
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/generic
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/hal_call
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/printer
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/ui
+	$(Q)$(MKDIR) $(BUILDDIR)/hal/gpio/sun8iw20
+	$(Q)$(MKDIR) $(BUILDDIR)/hal/ccmu
 	$(Q)$(MKDIR) $(BUILDDIR)/arch
 	$(Q)$(MKDIR) $(BUILDDIR)/oemhead
 	$(Q)$(MKDIR) $(BUILDDIR)/kernel/FreeRTOS

@@ -24,7 +24,9 @@ int reset_control_unregister(struct reset_control *reset) //for reset system
         return 0;
     }
 
-    list_for_each_entry(rcdev, &reset_control_list, node)
+    // OpenCentauri: Remove nonstandard use of typeof and expand macro.
+    // list_for_each_entry(rcdev, &reset_control_list, node)
+    for (rcdev = container_of((&reset_control_list)->next, struct reset_control_dev, node); &rcdev->node != (&reset_control_list); rcdev = container_of(rcdev->node.next, struct reset_control_dev, node))
     {
         if (rcdev->type != reset->rcdev->type)
         {
@@ -50,7 +52,9 @@ struct reset_control *hal_reset_control_get(hal_reset_type_t type, hal_reset_id_
         return NULL;
     }
 
-    list_for_each_entry(rcdev, &reset_control_list, node)
+    // OpenCentauri: Remove nonstandard use of typeof and expand macro.
+    // list_for_each_entry(rcdev, &reset_control_list, node)
+    for (rcdev = container_of((&reset_control_list)->next, struct reset_control_dev, node); &rcdev->node != (&reset_control_list); rcdev = container_of(rcdev->node.next, struct reset_control_dev, node))
     {
         if (rcdev->type != type)
         {
