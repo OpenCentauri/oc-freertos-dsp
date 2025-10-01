@@ -6,6 +6,28 @@
 #include <sunxi_hal_pwm.h>
 
 #include <sunxi_hal_spi.h>
+
+// OpenCentauri kludge from pd... Couldn't find this defined anywhere else
+// Looked in xtensa compiler, Elegoo sources, BSPs, etc. So just defining here...
+typedef struct {
+    volatile uint32_t AFR[2];
+    volatile uint32_t ODR;
+    volatile uint32_t PUPDR[2];
+} GPIO_TypeDef;
+
+struct gpio_out {
+    GPIO_TypeDef *regs;
+    uint32_t bit;
+    uint32_t pin;
+};
+
+struct gpio_in {
+    GPIO_TypeDef *regs;
+    uint32_t bit;
+    uint32_t pin;
+};
+// End OpenCentauri Kludge
+
 extern struct gpio_out g_GAM_DBG_gpio1;
 extern struct gpio_out g_GAM_DBG_gpio2;
 extern struct gpio_out g_GAM_DBG_gpio3;
