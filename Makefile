@@ -55,6 +55,7 @@ DFLAGS += -DPERFORMANCE_RUN=1 -DITERATIONS=23000
 DFLAGS += -DCONFIG_ARCH_SUN8IW20 -DCONFIG_ARCH_PLATFORM="sun8iw20" -DCONFIG_EVB_PLATFORM
 DFLAGS += -DCONFIG_EVB_PLATFORM -DCONFIG_CORE_DSP0 -DCONFIG_CORE_ID="dsp0" 
 DFLAGS += -DCONFIG_LSP_NORMAL_START -DCONFIG_LSP_DIR="default"
+DFLAGS += -DCONFIG_SOC_SUN20IW1 # Clock, think this is right. Not CONFIG_ARCH_SUN20IW2
 # Kernel Options
 DFLAGS += -DCONFIG_KERNEL_FREERTOS -DCONFIG_KERNEL_XTENSA_V1_7
 DFLAGS += -DCONFIG_KERNEL_VERSION_DIR="FreeRTOS_xtensa_v1.7" -DCONFIG_MEMMANG_HEAP_4
@@ -180,6 +181,10 @@ HAL_SRC += hal/gpio/sun8iw20/gpio-sun8iw20
 # CCMU HAL Objects (Clock)
 HAL_SRC += hal/ccmu/hal_clk
 HAL_SRC += hal/ccmu/hal_reset
+# ONLY include these if -DCONFIG_SOC_SUN20IW1, which I just added
+HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20
+HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20-r
+HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20-rtc
 # MsgBox HAL Objects
 HAL_SRC += hal/msgbox/msgbox_amp/msgbox_amp
 HAL_SRC += hal/msgbox/msgbox_sx/hal_msgbox_sx
@@ -255,6 +260,7 @@ builddir:
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/gpio/sun8iw20
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/rtc
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/ccmu
+	$(Q)$(MKDIR) $(BUILDDIR)/hal/ccmu/sunxi_ng
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/msgbox/msgbox_amp
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/msgbox/msgbox_sx
 	$(Q)$(MKDIR) $(BUILDDIR)/arch
