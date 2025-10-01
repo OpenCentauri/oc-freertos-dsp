@@ -2,6 +2,34 @@
 #define __SUNXI_PLATFORM_H
 
 #include <imgdts.h>
+
+// OpenCentauri:  Begin Pulling Stuff in from OSS platform.h
+#define readl(reg) (*((volatile unsigned int *) (reg)))
+#define writel(reg, value) *((volatile unsigned int *) (reg)) = value
+
+#define SUNXI_UART0_BA 0x02500000
+#define SUNXI_UART3_BA 0x02500C00
+
+#define UART_THR 0
+#define UART_RHR 0
+#define UART_DLL 0
+#define UART_DLH 4
+#define UART_IER 4
+#define UART_IIR 8
+#define UART_FCR 8
+#define UART_LCR 0xc
+#define UART_MCR 0x10
+#define UART_LSR 0x14
+#define UART_MSR 0x18
+#define UART_USR 0x7C
+
+#define SUNXI_MSGBOX_ARM_BASE 0x03003000
+#define SUNXI_MSGBOX_DSP_BASE 0x01701000
+
+#define TIMER1_IRQ 1
+#define MSGBOX_IRQ 3
+// OpenCentauri: End OSS pull-in
+
 /* dsp use reg*/
 #define SUNXI_GPIO_BASE 0x2000000
 
@@ -15,9 +43,9 @@
 
 #define RTOS_MAGIC				"freertos"
 #define MAGIC_SIZE				8
-#define RTOS_VERSION			1
+#define RTOS_VERSION				1
 #define PADDING_LEN				(512)
-#define DTS_SIZE                 (32)
+#define DTS_SIZE				(32)
 
 /*the size is 48*/
 typedef struct rtos_img_hdr_t {
@@ -137,6 +165,5 @@ struct spare_rtos_head_t {
 extern char *_oemhead_text_start;
 #define platform_head ((struct spare_rtos_head_t *)&_oemhead_text_start)
 #endif /* CONFIG_OEMHEAD */
-
 
 #endif /* __SUNXI_PLATFORM_H */

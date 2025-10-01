@@ -1,6 +1,9 @@
 #ifndef __PLATFROM_H
 #define __PLATFROM_H
 
+// OpenCentauri: This file supplanted by arch/sun8iw20/include/platform.h
+// Pulled some stuff from here that seemed important into that version!
+
 #define readl(reg) (*((volatile unsigned int *) (reg)))
 #define writel(reg, value) *((volatile unsigned int *) (reg)) = value
 
