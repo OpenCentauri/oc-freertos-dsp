@@ -72,29 +72,31 @@ typedef enum
     HAL_CLK_STATUS_OK = 0,                    /**< Successful. */
 } hal_clk_status_t;
 
-#if defined(CONFIG_DRIVERS_SUNXI_CLK)
-
-#define HAL_SUNXI_CCU (0)
-typedef unsigned int hal_clk_id_t;
-typedef hal_clk_id_t hal_clk_t;
-
-#include "sunxi/clk.h"
-
-#endif
+// OpenCentauri: Commented out this block to resolve conflicting type definitions
+// #if defined(CONFIG_DRIVERS_SUNXI_CLK)
+// 
+// #define HAL_SUNXI_CCU (0)
+// typedef unsigned int hal_clk_id_t;
+// typedef hal_clk_id_t hal_clk_t;
+// 
+// #include "sunxi/clk.h"
+// 
+// #endif
 
 #if defined(CONFIG_DRIVERS_SUNXI_CCU)
 /************************************************************************************************
 * Enum hal_clk_type_t
 * @Description: This enum defines the type of Clock
 *************************************************************************************************/
-typedef enum
-{
-    HAL_SUNXI_FIXED_CCU = 0,
-    HAL_SUNXI_RTC_CCU,
-    HAL_SUNXI_CCU,
-    HAL_SUNXI_R_CCU,
-    HAL_SUNXI_CCU_NUMBER,
-} hal_clk_type_t;
+// OpenCentauri: Commented out to resolve conflicting type definition
+// typedef enum
+// {
+//     HAL_SUNXI_FIXED_CCU = 0,
+//     HAL_SUNXI_RTC_CCU,
+//     HAL_SUNXI_CCU,
+//     HAL_SUNXI_R_CCU,
+//     HAL_SUNXI_CCU_NUMBER,
+// } hal_clk_type_t;
 
 typedef u32 hal_clk_id_t;
 

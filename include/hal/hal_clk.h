@@ -35,8 +35,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <sunxi_hal_common.h>
-#include <ccmu/common_ccmu.h>
 #include <ccmu/platform_ccmu.h>
+#include <ccmu/common_ccmu.h>
 
 #define hal_clk_api_version "hal_clk_api_version_1_1_0"
 
