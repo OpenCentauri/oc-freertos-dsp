@@ -142,13 +142,20 @@ static void hal_htimer_irq_callback(void *param)
 }
 void timer_init(void)
 {
-    hal_htimer_init(HAL_HRTIMER1);
+    // OpenCentauri: The version of HAL we use only requires one call to hal_htimer_init()
+    // with no arguments. This calls sunxi_htimer_init() which which contains a loop that
+    // iterates through an array called sunxi_htimer_irq_num. This array holds the identifiers
+    // for both SUNXI_IRQ_HSTIMER0 and SUNXI_IRQ_HSTIMER1.
+    // Thus: We only need to cal hal_htimer_init() once for initializing both high-res HW timers
+    hal_htimer_init();
+
+    // hal_htimer_init(HAL_HRTIMER1);
     timer1_total_times = 0;
     hal_htimer_set_periodic(HAL_HRTIMER1, 0xffffffff, hal_htimer_irq_callback, NULL);//0xffffffff 20000000
     timer_reset();     //--G-G------
     
     irqstatus_t flag = irq_save();  
-    hal_htimer_init(HAL_HRTIMER0);
+    // hal_htimer_init(HAL_HRTIMER0);
     hal_htimer_set_periodic(HAL_HRTIMER0, 200000, SysTick_Handler, NULL);
     timer_kick();  //--G-G-6.30-----
     irq_restore(flag);
