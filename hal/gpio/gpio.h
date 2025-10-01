@@ -106,6 +106,21 @@ extern "C" {
 #define PULL_PINS_BITS      2
 #define PULL_PINS_MASK      0x03
 
+// OpenCentauri: Hardcode some #defines since can't find
+//               definitions in any headers from Elegoo or other...
+#define PINS_BANK_MASK      (PINS_PER_BANK - 1)
+
+#define MUX_SHIFT_BITS      2
+#define MUX_SHIFT_MASK      (MUX_PINS_PER_REG - 1)
+#define MUX_OFFSET_BITS     3
+#define MUX_OFFSET_MASK     0x3
+
+#define PULL_SHIFT_BITS     1
+#define PULL_SHIFT_MASK     (PULL_PINS_PER_REG - 1)
+#define PULL_OFFSET_BITS    4
+#define PULL_OFFSET_MASK    0x1
+// OpenCentauri: END JANK
+
 #define IRQ_PER_BANK        32
 
 #define IRQ_CFG_REG     0x200
