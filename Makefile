@@ -186,7 +186,7 @@ HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20
 HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20-r
 HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20-rtc
 # MsgBox HAL Objects
-HAL_SRC += hal/msgbox/msgbox_amp/msgbox_amp
+#HAL_SRC += hal/msgbox/msgbox_amp/msgbox_amp
 HAL_SRC += hal/msgbox/msgbox_sx/hal_msgbox_sx
 HAL_SRC += hal/msgbox/msgbox_sx/msgbox_sx
 HAL_SRC += hal/msgbox/msgbox_sx/msgbox_adapt
