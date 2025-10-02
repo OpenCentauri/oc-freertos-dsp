@@ -6,6 +6,11 @@
 
 #include "ccu.h"
 #include "ccu_phase.h"
+#include <errno.h>
+
+// OpenCentauri: Locally define DIV_ROUND_CLOSEST to avoid including application-level compiler.h
+// This macro performs integer division and rounds to the closest integer.
+#define DIV_ROUND_CLOSEST(x, divisor) ((((x) + ((divisor) / 2)) / (divisor)))
 
 static int ccu_phase_get_phase(struct clk_hw *hw)
 {

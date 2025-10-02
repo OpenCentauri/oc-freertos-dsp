@@ -186,6 +186,26 @@ HAL_SRC += hal/ccmu/hal_reset
 HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20
 HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20-r
 HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20-rtc
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_common
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_div
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_frac
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_gate
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_mp
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_mult
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_mux
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_nk
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_nkm
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_nkmp
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_nm
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_phase
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_reset
+HAL_SRC += hal/ccmu/sunxi-ng/ccu_sdm
+HAL_SRC += hal/ccmu/sunxi-ng/ccu
+HAL_SRC += hal/ccmu/sunxi-ng/clk-divider
+HAL_SRC += hal/ccmu/sunxi-ng/clk-fixed-factor
+HAL_SRC += hal/ccmu/sunxi-ng/clk
+# OSAL
+HAL_SRC += hal/osal/hal_mutex-fixed-rate
 # General Purpose ADC HAL Objects
 HAL_SRC += hal/gpadc/hal_gpadc
 # Interrupt Controller HAL Objects

@@ -321,6 +321,8 @@ struct clk_ops
     unsigned long (*recalc_accuracy)(struct clk_hw *hw,
                                      unsigned long parent_accuracy);
     void (*init)(struct clk_hw *hw);
+    int (*get_phase)(struct clk_hw *hw);
+    int (*set_phase)(struct clk_hw *hw, int degrees);
 };
 
 /**
