@@ -7,12 +7,12 @@
 *
 * DISCLAIMER
 * THIRD PARTY LICENCES MAY BE REQUIRED TO IMPLEMENT THE SOLUTION/PRODUCT.
-* IF YOU NEED TO INTEGRATE THIRD PARTY¡¯S TECHNOLOGY (SONY, DTS, DOLBY, AVS OR MPEGLA, ETC.)
-* IN ALLWINNERS¡¯SDK OR PRODUCTS, YOU SHALL BE SOLELY RESPONSIBLE TO OBTAIN
+* IF YOU NEED TO INTEGRATE THIRD PARTYï¿½ï¿½S TECHNOLOGY (SONY, DTS, DOLBY, AVS OR MPEGLA, ETC.)
+* IN ALLWINNERSï¿½ï¿½SDK OR PRODUCTS, YOU SHALL BE SOLELY RESPONSIBLE TO OBTAIN
 * ALL APPROPRIATELY REQUIRED THIRD PARTY LICENCES.
 * ALLWINNER SHALL HAVE NO WARRANTY, INDEMNITY OR OTHER OBLIGATIONS WITH RESPECT TO MATTERS
 * COVERED UNDER ANY REQUIRED THIRD PARTY LICENSE.
-* YOU ARE SOLELY RESPONSIBLE FOR YOUR USAGE OF THIRD PARTY¡¯S TECHNOLOGY.
+* YOU ARE SOLELY RESPONSIBLE FOR YOUR USAGE OF THIRD PARTYï¿½ï¿½S TECHNOLOGY.
 *
 *
 * THIS SOFTWARE IS PROVIDED BY ALLWINNER"AS IS" AND TO THE MAXIMUM EXTENT
@@ -677,20 +677,21 @@ int hal_gpio_get_driving_level(gpio_pin_t pin, gpio_driving_level_t *level)
     return ret;
 }
 
-int hal_gpio_pinmux_set_function(gpio_pin_t pin, gpio_muxsel_t function_index)
-{
-    unsigned long config;
-    int ret = 0;
-
-    config = GPIO_CFG_PACK(GPIO_TYPE_FUNC, function_index);
-    ret = gpio_conf_set(pin, (unsigned long *)config);
-    if (ret < 0)
-    {
-        GPIO_ERR("set pin mux error!");
-        return ret;
-    }
-    return ret;
-}
+// OpenCentauri: For some reason the HAL definition for GPIO PinMux conflicts with Klipper definition, commenting this out to try and fix
+// int hal_gpio_pinmux_set_function(gpio_pin_t pin, gpio_muxsel_t function_index)
+// {
+//     unsigned long config;
+//     int ret = 0;
+// 
+//     config = GPIO_CFG_PACK(GPIO_TYPE_FUNC, function_index);
+//     ret = gpio_conf_set(pin, (unsigned long *)config);
+//     if (ret < 0)
+//     {
+//         GPIO_ERR("set pin mux error!");
+//         return ret;
+//     }
+//     return ret;
+// }
 
 int hal_gpio_sel_vol_mode(gpio_pin_t pin, gpio_power_mode_t  pm_sel)
 {
