@@ -185,6 +185,11 @@ HAL_SRC += hal/ccmu/hal_reset
 HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20
 HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20-r
 HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20-rtc
+# General Purpose ADC HAL Objects
+HAL_SRC += hal/gpadc/hal_gpadc
+# Timer HAL Objects
+HAL_SRC += hal/timer/hal_htimer
+HAL_SRC += hal/timer/sunxi_htimer
 # MsgBox HAL Objects
 #HAL_SRC += hal/msgbox/msgbox_amp/msgbox_amp
 HAL_SRC += hal/msgbox/msgbox_sx/hal_msgbox_sx
@@ -261,7 +266,8 @@ builddir:
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/rtc
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/ccmu
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/ccmu/sunxi-ng
-	$(Q)$(MKDIR) $(BUILDDIR)/hal/msgbox/msgbox_amp
+	$(Q)$(MKDIR) $(BUILDDIR)/hal/gpadc
+	$(Q)$(MKDIR) $(BUILDDIR)/hal/timer
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/msgbox/msgbox_sx
 	$(Q)$(MKDIR) $(BUILDDIR)/arch
 	$(Q)$(MKDIR) $(BUILDDIR)/oemhead
