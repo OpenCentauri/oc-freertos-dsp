@@ -204,8 +204,9 @@ HAL_SRC += hal/ccmu/sunxi-ng/ccu
 HAL_SRC += hal/ccmu/sunxi-ng/clk-divider
 HAL_SRC += hal/ccmu/sunxi-ng/clk-fixed-factor
 HAL_SRC += hal/ccmu/sunxi-ng/clk
+HAL_SRC += hal/ccmu/sunxi-ng/clk-fixed-rate
 # OSAL
-HAL_SRC += hal/osal/hal_mutex-fixed-rate
+HAL_SRC += hal/osal/hal_mutex
 # General Purpose ADC HAL Objects
 HAL_SRC += hal/gpadc/hal_gpadc
 # Interrupt Controller HAL Objects
@@ -287,6 +288,7 @@ builddir:
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/hal_call
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/printer
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/ui
+	$(Q)$(MKDIR) $(BUILDDIR)/hal/osal
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/gpio/sun8iw20
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/rtc
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/ccmu
