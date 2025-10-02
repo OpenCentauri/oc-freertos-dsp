@@ -40,8 +40,8 @@ static struct sunxi_htimer *g_htimer;
 
 static const int sunxi_htimer_irq_num[] =
 {
-    SUNXI_IRQ_HSTIMER0,
-    SUNXI_IRQ_HSTIMER1,
+    SUNXI_DSP_IRQ_DSP_TIMER0,
+    SUNXI_DSP_IRQ_DSP_TIMER1,
 };
 
 
