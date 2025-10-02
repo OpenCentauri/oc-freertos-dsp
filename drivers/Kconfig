@@ -1,0 +1,39 @@
+comment "Configure all required driver sub-systems"
+
+config DRIVER_SYSCONFIG
+	bool "Rtos Hal support sysconfig.fex"
+	default y
+
+menu "SoC related device drivers"
+
+config DRIVERS_CHIP
+	bool
+	default y
+
+source "drivers/hal/source/prcm/Kconfig"
+source "drivers/hal/source/ccmu/Kconfig"
+source "drivers/hal/source/uart/Kconfig"
+source "drivers/hal/source/intc/Kconfig"
+source "drivers/hal/source/dma/Kconfig"
+source "drivers/hal/source/gpio/Kconfig"
+source "drivers/hal/source/twi/Kconfig"
+source "drivers/hal/source/watchdog/Kconfig"
+source "drivers/hal/source/msgbox/Kconfig"
+source "drivers/hal/source/hwspinlock/Kconfig"
+source "drivers/hal/source/timer/Kconfig"
+source "drivers/hal/source/sound/Kconfig"
+
+endmenu
+
+
+menu "Board related device drivers"
+
+config DRIVERS_BOARD
+	bool
+	default y
+
+source "drivers/board/Kconfig"
+
+endmenu
+
+source "drivers/osal/Kconfig"
