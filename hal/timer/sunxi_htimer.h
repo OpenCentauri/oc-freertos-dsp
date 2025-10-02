@@ -42,6 +42,18 @@
 #include "irqs.h"
 #include <sound/aw_types.h>
 #include <spinlock.h>
+#include <io.h>
+
+// OpenCentauri: Implement missing low-level timer functions
+static inline void set_htimer_intval(uint32_t value, uint32_t timer)
+{
+    writel(HTIMER_INTVAL_LO_REG(timer), value);
+}
+
+static inline uint32_t read_htimer_current_value(uint32_t timer)
+{
+    return readl(HTIMER_CNTVAL_LO_REG(timer));
+}
 
 #ifdef __cplusplus
 extern "C" {

@@ -188,6 +188,10 @@ HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20-r
 HAL_SRC += hal/ccmu/sunxi-ng/ccu-sun8iw20-rtc
 # General Purpose ADC HAL Objects
 HAL_SRC += hal/gpadc/hal_gpadc
+# Interrupt Controller HAL Objects
+HAL_SRC += hal/intc/intc
+HAL_SRC += hal/intc/intc_manager
+HAL_SRC += hal/intc/hal_intc
 # Timer HAL Objects
 HAL_SRC += hal/timer/hal_htimer
 HAL_SRC += hal/timer/sunxi_htimer
@@ -268,6 +272,7 @@ builddir:
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/ccmu
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/ccmu/sunxi-ng
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/gpadc
+	$(Q)$(MKDIR) $(BUILDDIR)/hal/intc
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/timer
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/msgbox/msgbox_sx
 	$(Q)$(MKDIR) $(BUILDDIR)/arch
