@@ -23,11 +23,9 @@ extern int dhry_main(int t);
 extern void coremark_main(void);
 
 /*
- *  Main task function
- */
 void vTaskMain(void *pvParameters) {
     (void) pvParameters;
-    dsp_msgbox_init(0x00);
+    //dsp_msgbox_init(0x00);
     vTaskDelay(500);
     dhry_main(10000000);
     linpack_main();
@@ -35,12 +33,13 @@ void vTaskMain(void *pvParameters) {
     uint32_t sdata = 0;
     char* msg = "Hello, World!\n";
     while (1) {
-        dsp_msgbox_channel_send(0x02, (uint8_t *)msg, strlen(msg));
-        //printf("task led run on task\n");
+        //dsp_msgbox_channel_send(0x02, (uint8_t *)msg, strlen(msg));
+        printf("Hello, World: %u\n", sdata);
         sdata++;
-        vTaskDelay(500);
+        vTaskDelay(1000);
     }
 }
+*/
 
 /*
  *  Function to print banner
@@ -59,10 +58,27 @@ void print_banner(void) {
 }
 
 /*
+ *  Main task function
+ */
+void vTaskMain(void *pvParameters) {
+    (void) pvParameters;
+
+    char* msg = "Hello, World\n";
+
+    for(unsigned int i=0;;++i) {
+        printf("%s: %u\n", msg, i);
+        vTaskDelay(1000);
+    }
+}
+
+/*
  *  Main function
  */
 int main(void) {
     xTaskHandle xHandleTaskMain;
+
+    // Crappy usleep() before printing banner
+    //for(unsigned int i=0;i<100000000;++i);
 
     print_banner();
 
@@ -71,5 +87,6 @@ int main(void) {
     vTaskStartScheduler();
 
     printf("vTaskStartScheduler FAILED!\n");
+
     return 1;
 }

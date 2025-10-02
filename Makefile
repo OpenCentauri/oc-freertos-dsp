@@ -149,7 +149,7 @@ $(BUILDDIR)/%.o: %.c
 	$(Q)$(CC) -c $(CFLAGS) -o $@ $<
 
 install:
-	scp build/dsp.elf carbon2:/mnt/exUDISK/
+	scp build/dsp.elf carbon:/mnt/exUDISK/
 
 clean:
 	$(Q)rm -rf $(BUILDDIR)
