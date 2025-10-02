@@ -33,10 +33,20 @@
 #include "hal_clk.h"
 #include "sunxi_htimer.h"
 
+// OpenCentauri: Correctly get clock handle before enabling
 void hal_htimer_init(void)
 {
     int ret;
-    ret = hal_clock_enable(HAL_CLK_PERIPH_HSTIMER);
+    hal_clk_t clk;
+
+    clk = hal_clock_get(HAL_CLK_PERIPH, HAL_CLK_PERIPH_HSTIMER);
+    if (clk == NULL)
+    {
+        printf("Failed to get htimer clock\n");
+        return;
+    }
+
+    ret = hal_clock_enable(clk);
     if (ret < 0)
     {
         printf("clk enable error,error num %d\n!", ret);

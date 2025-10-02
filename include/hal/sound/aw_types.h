@@ -30,7 +30,8 @@ typedef signed long long    s64;
 typedef signed int          s32;
 typedef signed short        s16;
 typedef signed char         s8;
-typedef signed char         bool;
+// OpenCentauri: Commented out to avoid conflict with C99 bool
+// typedef signed char         bool;
 typedef unsigned int        size_t;
 typedef unsigned int        uint;
 

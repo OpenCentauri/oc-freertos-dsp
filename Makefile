@@ -33,6 +33,7 @@ IFLAGS += -I ./arch
 IFLAGS += -I ./arch/include
 IFLAGS += -I ./arch/sun8iw20/include
 IFLAGS += -I ./src
+IFLAGS += -I ./src/include/board
 
 # Added for OpenCentauri dsp0 port
 IFLAGS += -I ./hal
