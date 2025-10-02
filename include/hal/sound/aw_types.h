@@ -23,14 +23,14 @@
 /* general data type defines */
 typedef	void * 		    HANDLE;
 typedef unsigned long long  u64;
-//typedef unsigned int        u32;
+typedef unsigned int        u32;
 typedef unsigned short      u16;
 typedef unsigned char       u8;
 typedef signed long long    s64;
-//typedef signed int          s32;
+typedef signed int          s32;
 typedef signed short        s16;
 typedef signed char         s8;
-//typedef signed char         bool;
+typedef signed char         bool;
 typedef unsigned int        size_t;
 typedef unsigned int        uint;
 

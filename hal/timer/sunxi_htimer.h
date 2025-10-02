@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include "platform.h"
 #include "irqs.h"
-#include "aw_types.h"
+#include <sound/aw_types.h>
 #include <spinlock.h>
 
 #ifdef __cplusplus
