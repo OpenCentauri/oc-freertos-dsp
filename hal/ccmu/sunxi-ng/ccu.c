@@ -63,7 +63,9 @@ struct clk_core *clk_core_get_by_name(const char *name)
 {
     struct clk_core *core = NULL;
 
-    list_for_each_entry(core, &clk_root_list, node)
+    // OpenCentauri: Manually expand list_for_each_entry to remove usage of typeof
+    // list_for_each_entry(core, &clk_root_list, node)
+    for (core = container_of((&clk_root_list)->next, struct clk_core, node); &core->node != (&clk_root_list); core = container_of(core->node.next, struct clk_core, node))
     {
         if (strcmp(name, core->name))
         {
@@ -680,7 +682,9 @@ int clk_hw_unregister(struct clk_hw *hw)
         return 0;
     }
 
-    list_for_each_entry(core, &clk_root_list, node)
+    // OpenCentauri: Manually expand list_for_each_entry to remove usage of typeof
+    // list_for_each_entry(core, &clk_root_list, node)
+    for (core = container_of((&clk_root_list)->next, struct clk_core, node); &core->node != (&clk_root_list); core = container_of(core->node.next, struct clk_core, node))
     {
         if (core->hw->type != hw->type)
         {
@@ -703,7 +707,9 @@ struct clk_core *clk_core_get(hal_clk_type_t type, hal_clk_id_t id)
 {
     struct clk_core *core = NULL;
 
-    list_for_each_entry(core, &clk_root_list, node)
+    // OpenCentauri: Manually expand list_for_each_entry to remove usage of typeof
+    // list_for_each_entry(core, &clk_root_list, node)
+    for (core = container_of((&clk_root_list)->next, struct clk_core, node); &core->node != (&clk_root_list); core = container_of(core->node.next, struct clk_core, node))
     {
         if (core->hw->type != type)
         {
