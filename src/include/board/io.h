@@ -2,6 +2,8 @@
 #define __GENERIC_IO_H
 
 #include <stdint.h> // uint32_t
+#undef readl
+#undef writel
 #include "../../include/printer/compiler.h" // barrier
 
 static inline void writel(void *addr, uint32_t val) {
