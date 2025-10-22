@@ -23,7 +23,7 @@ void irq_enable_all()
     // hal_interrupt_enable();
     // portENABLE_INTERRUPTS();
     XTOS_SET_INTLEVEL(0);   
-    XT_RSIL(0);         //      repo/lichee/rtos-dsp/freertos/XtDevTools/RI-2020.4-linux/aw_axi_cfg0/xtensa-elf/arch/include/xtensa/tie/xt_core.h
+    //XT_RSIL(0);         //      repo/lichee/rtos-dsp/freertos/XtDevTools/RI-2020.4-linux/aw_axi_cfg0/xtensa-elf/arch/include/xtensa/tie/xt_core.h
     // _TIE_xt_core_RSIL(0);   
     // asm volatile("cpsie i" ::: "memory");
 }

@@ -7,6 +7,10 @@
 // #include "stm32/internal.h" // NVIC_SystemReset
 #include "../../include/printer/command.h" // DECL_COMMAND_FLAGS
 
+extern void _ResetHandler(void);
+
+static void (*volatile reset_handler_fn)(void) = _ResetHandler;
+
 void command_reset(uint32_t *args)
 {
 	// struct reset_control *reset = hal_reset_control_get(HAL_SUNXI_RESET, RST_BUS_AUDIO_CODEC);
@@ -15,6 +19,6 @@ void command_reset(uint32_t *args)
     // NVIC_SystemReset();          //--G-G-2022-08-03---
     // share_space_clear();
     // shutdown("reset");
-_ResetHandler();     //--G-G-2022-08-09---
+    reset_handler_fn();     //--G-G-2022-08-09---
 }
 DECL_COMMAND_FLAGS(command_reset, HF_IN_SHUTDOWN, "reset");
