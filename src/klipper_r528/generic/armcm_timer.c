@@ -25,6 +25,7 @@
 #include "sunxi_hal_htimer.h"
 #include "hal_clk.h"
 #include "delay.h"
+#include "../../../hal/timer/sunxi_htimer.h"
 
 
 

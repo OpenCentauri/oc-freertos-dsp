@@ -7,6 +7,7 @@
 #include "../../include/board/irq.h" // irqstatus_t
 #include <portmacro.h>
 #include <hal_interrupt.h>
+#include "../../../include/xtensa/tie/xt_core.h"
 
 void irq_disable_all()
 {

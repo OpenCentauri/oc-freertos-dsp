@@ -79,7 +79,7 @@ DFLAGS += -DCONFIG_COMPONENTS_AW_ALSA_RPAF_READ_CH=1
 DFLAGS += -DCONFIG_COMPONENTS_AW_ALSA_RPAF_WRITE_CH=1
 DFLAGS += -DCONFIG_OEMHEAD
 # Backtrace Support
-DFLAGS += -DCONFIG_DEBUG_BACKTRACE
+#DFLAGS += -DCONFIG_DEBUG_BACKTRACE
 # Linux Debug Support
 DFLAGS += -DCONFIG_PM_CLIENT_DSP_WAITI
 # DSPFREQ option features
@@ -205,8 +205,19 @@ HAL_SRC += hal/ccmu/sunxi-ng/clk-divider
 HAL_SRC += hal/ccmu/sunxi-ng/clk-fixed-factor
 HAL_SRC += hal/ccmu/sunxi-ng/clk
 HAL_SRC += hal/ccmu/sunxi-ng/clk-fixed-rate
-# OSAL
-HAL_SRC += hal/osal/hal_mutex
+# OSAL (sources live under drivers/osal/src)
+HAL_SRC += drivers/osal/src/hal_atomic
+HAL_SRC += drivers/osal/src/hal_cache
+HAL_SRC += drivers/osal/src/hal_interrupt
+HAL_SRC += drivers/osal/src/hal_mem
+HAL_SRC += drivers/osal/src/hal_mutex
+HAL_SRC += drivers/osal/src/hal_queue
+HAL_SRC += drivers/osal/src/hal_sem
+HAL_SRC += drivers/osal/src/hal_thread
+HAL_SRC += drivers/osal/src/hal_timer
+# DRV
+HAL_SRC += drivers/drv/hal_xea2
+HAL_SRC += drivers/drv/arch_timer
 # General Purpose ADC HAL Objects
 HAL_SRC += hal/gpadc/hal_gpadc
 # Interrupt Controller HAL Objects
@@ -288,7 +299,8 @@ builddir:
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/hal_call
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/printer
 	$(Q)$(MKDIR) $(BUILDDIR)/src/klipper_r528/ui
-	$(Q)$(MKDIR) $(BUILDDIR)/hal/osal
+	$(Q)$(MKDIR) $(BUILDDIR)/drivers/osal/src
+	$(Q)$(MKDIR) $(BUILDDIR)/drivers/drv
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/gpio/sun8iw20
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/rtc
 	$(Q)$(MKDIR) $(BUILDDIR)/hal/ccmu

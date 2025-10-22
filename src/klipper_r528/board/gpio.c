@@ -145,9 +145,9 @@ struct gpio_in gpio_in_setup(gpio_pin_t pin, int32_t pull)
 void gpio_in_reset(struct gpio_in *g, gpio_pull_status_t pull_up)
 {
     irqstatus_t flag = irq_save();
-    // hal_gpio_set_direction_cbd(g, GPIO_MUXSEL_IN);//GPIO_MUXSEL_IN  GPIO_DIRECTION_INPUT
-    // hal_gpio_set_pull_cbd(g, pull_up);
-    gpio_peripheral(g, GPIO_MUXSEL_IN, pull_up);
+    hal_gpio_set_direction(g->pin, GPIO_MUXSEL_IN);//GPIO_MUXSEL_IN  GPIO_DIRECTION_INPUT
+    hal_gpio_set_pull(g->pin, pull_up);
+    //gpio_peripheral(g, GPIO_MUXSEL_IN, pull_up);
     irq_restore(flag);
 }
 

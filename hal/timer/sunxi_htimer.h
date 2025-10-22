@@ -44,17 +44,6 @@
 #include <spinlock.h>
 #include <io.h>
 
-// OpenCentauri: Implement missing low-level timer functions
-static inline void set_htimer_intval(uint32_t value, uint32_t timer)
-{
-    writel(HTIMER_INTVAL_LO_REG(timer), value);
-}
-
-static inline uint32_t read_htimer_current_value(uint32_t timer)
-{
-    return readl(HTIMER_CNTVAL_LO_REG(timer));
-}
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -88,6 +77,17 @@ typedef void (*timer_callback)(void *param);
 #define HTIMER_CNTVAL_HI_REG(val)       (SUNXI_HSTIMER_PBASE + (0x20 * (val) + 0x30))
 
 #define HTIMER_SYNC_TICKS           3
+
+// OpenCentauri: Implement missing low-level timer functions
+static inline void set_htimer_intval(uint32_t value, uint32_t timer)
+{
+    writel(HTIMER_INTVAL_LO_REG(timer), value);
+}
+
+static inline uint32_t read_htimer_current_value(uint32_t timer)
+{
+    return readl(HTIMER_CNTVAL_LO_REG(timer));
+}
 
 struct sunxi_htimer
 {
