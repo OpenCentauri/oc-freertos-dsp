@@ -3,3 +3,4 @@ tools/xtensa-hifi4-dsp.tar.gz
 build/
 .vscode/settings.json
 include/version.h
+**/*.swp
