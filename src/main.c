@@ -13,7 +13,7 @@
 
 #include "FreeRTOS.h"
 #include "platform.h"
-#include "kbuf.h"
+#include "sharespace.h"
 #include "task.h"
 
 /*
@@ -24,6 +24,7 @@ extern int dhry_main(int t);
 extern void coremark_main(void);
 
 /*
+// Original FreeRTOS Hifi4 main task, kept for reference
 void vTaskMain(void *pvParameters) {
     (void) pvParameters;
     //dsp_msgbox_init(0x00);

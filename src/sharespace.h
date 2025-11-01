@@ -25,33 +25,7 @@ typedef struct __attribute__((packed)) {
 
 
 // DTS Sharespace definitions
-#define DTS_OPEN 1 // Assuming DTS_OPEN value
 
-typedef struct {
-    uint32_t status;
-    uint32_t dsp_write_addr;
-    uint32_t dsp_write_size;
-    uint32_t arm_write_addr;
-    uint32_t arm_write_size;
-    uint32_t dsp_log_addr;
-    uint32_t dsp_log_size;
-} dts_sharespace_t;
-
-typedef struct {
-    // Placeholder for other fields if any, based on actual definition
-    dts_sharespace_t dts_sharespace;
-    // Placeholder for other fields if any
-} dts_msg_t;
-
-typedef struct {
-    // Placeholder for other fields if any, based on actual definition
-    struct { // rtos_img_hdr
-        dts_msg_t dts_msg;
-    } rtos_img_hdr;
-    // Placeholder for other fields if any
-} spare_rtos_head_t;
-
-extern volatile spare_rtos_head_t *platform_head;
 
 
 // Function prototypes

@@ -1,6 +1,7 @@
 #ifndef __PLATFROM_H
 #define __PLATFROM_H
 
+#include <stdint.h>
 #include <imgdts.h>
 
 #define readl(reg) (*((volatile unsigned int *) (reg)))
@@ -44,8 +45,7 @@
  *     reg = <0x42100000 0x1000 0x42101000 0x1000 0x42102000 0xe000 0x00 0x00>;
  */
 // Seems like correct base address for 8KB buf
-//#define DSP_SHARED_MEMORY_PHYSICAL_ADDRESS 0x42101000
-#define DSP_SHARED_MEMORY_PHYSICAL_ADDRESS 0x42100000
+#define SUNXI_SHAREDSPACE_BASE 0x42100000
 
 #define TIMER1_IRQ 1
 #define MSGBOX_IRQ 3

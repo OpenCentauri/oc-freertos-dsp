@@ -1,4 +1,5 @@
-#include "kbuf.h"
+#include "platform.h"
+#include "sharespace.h"
 #include <string.h> // For memcpy and memset
 
 // Pointers to the shared memory regions.
