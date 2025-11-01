@@ -73,14 +73,14 @@ void vTaskMain(void *pvParameters) {
     char outbuf[maxsize];
 
     char* msg = "Hello, World";
-    int ret;
+    //int ret;
 
     // Initialize the shared memory communication
     sharespace_init();
 
     for(unsigned int i=0;;++i) {
         snprintf(outbuf, maxsize, "%s: %u\n", msg, i);
-        ret = sharespace_write(outbuf, strlen(outbuf)+1);
+        sharespace_write(outbuf, strlen(outbuf)+1);
         // Check ret to make sure the write was successful! Or not...
         vTaskDelay(1000);
     }
@@ -116,6 +116,7 @@ int main(void) {
 
     // Never get here
     */
+    print_banner();
 
     xTaskCreate(vTaskMain, "Task Main", 4096, NULL, 1, &xHandleTaskMain);
     printf("vTaskStartScheduler\n");

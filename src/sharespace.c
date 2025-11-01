@@ -2,6 +2,7 @@
 #include "sharespace.h"
 #include <string.h> // For memcpy and memset
 #include <stdio.h>
+//#include <xtensa/hal.h>
 
 // Pointers to the shared memory regions.
 static volatile uint8_t* dsp_reads_from_arm = NULL; // ARM writes here, DSP reads from here.
@@ -54,7 +55,7 @@ void sharespace_fake_init(void) {
     printf("Initialized Message Head Pointers:\n");
     printf("  ARM Head Pointer: %p\n", (void*)arm_head_ptr);
     printf("  DSP Head Pointer: %p\n", (void*)dsp_head_ptr);
-    printf("DONE DSP INIT!\n");
+    printf("DONE DSP FAKEINIT!\n");
     return;
 }
 
@@ -91,6 +92,7 @@ void sharespace_init(void) {
 
     MsgHead dsp_head = { .read_addr = MIN_ADDR, .write_addr = MIN_ADDR, .init_state = 1 };
     memcpy((void*)dsp_head_ptr, &dsp_head, sizeof(MsgHead));
+    //xthal_dcache_region_writeback((void*)dsp_head_ptr, sizeof(MsgHead));
 
     uint32_t signal_msg = (dsp_head.write_addr << 16) | dsp_head.read_addr;
     //rpmsg_signal_host(signal_msg);
@@ -141,6 +143,7 @@ int sharespace_write(const void* data, int len) {
 
     dsp_head.write_addr = (local_write_addr + len) % (MAX_ADDR - MIN_ADDR) + MIN_ADDR;
     memcpy((void*)dsp_head_ptr, &dsp_head, sizeof(MsgHead));
+    //xthal_dcache_region_writeback((void*)dsp_head_ptr, sizeof(MsgHead));
 
     uint32_t signal_msg = (dsp_head.write_addr << 16) | dsp_head.read_addr;
     //rpmsg_signal_host(signal_msg);
