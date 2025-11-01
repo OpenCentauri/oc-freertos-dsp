@@ -63,10 +63,22 @@ void print_banner(void) {
 void vTaskMain(void *pvParameters) {
     (void) pvParameters;
 
-    char* msg = "Hello, World\n";
+    const int maxsize = 1024;
+    char outbuf[maxsize];
+
+    char* msg = "Hello, World";
+    int ret;
+
+    // Initialize the kbuf communication library with the known physical address.
+    kbuf_init((void*)DSP_SHARED_MEMORY_PHYSICAL_ADDRESS); 
+
+    // Wait for the host to be ready.
+    kbuf_wait_for_host_init();
 
     for(unsigned int i=0;;++i) {
-        printf("%s: %u\n", msg, i);
+        snprintf(outbuf, maxsize, "%s: %u\n", msg, i);
+        ret = kbuf_write_to_host(outbuf, strlen(outbuf));
+        // Check ret to make sure the write was successful! Or not...
         vTaskDelay(1000);
     }
 }

@@ -36,6 +36,16 @@
 
 #define SUNXI_GPIO_BASE 0x2000000
 
+/*
+ * OpenCentauri: From the CC Linux Device Tree:
+ * share_space@0x42100000 {
+ *     compatible = "allwinner,sun8iw20p1-dsp-share-space";
+ *     ...
+ *     reg = <0x42100000 0x1000 0x42101000 0x1000 0x42102000 0xe000 0x00 0x00>;
+ */
+// Seems like correct base address for 8KB buf
+#define DSP_SHARED_MEMORY_PHYSICAL_ADDRESS 0x42101000
+
 #define TIMER1_IRQ 1
 #define MSGBOX_IRQ 3
 
