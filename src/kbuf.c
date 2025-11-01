@@ -25,19 +25,37 @@ void kbuf_init(void* shared_mem_base) {
 }
 
 void kbuf_wait_for_host_init() {
-    // 1. Wait for the ARM host to set its init_state to 1.
-    // This mirrors the `wait_dsp_set_init` logic in the Rust code.
-    while (arm_head->init_state != 1) {
-        // Depending on the system, a small delay or a yield might be needed here.
+    // This function now handles initial synchronization and re-initialization.
+    while (1) {
+        // Check if the host has initialized its side of the shared memory.
+        // We check for init_state 1 (normal init) or 2 (re-init),
+        // and make sure the addresses are not the magic uninitialized value.
+        if ((arm_head->init_state == 1 || arm_head->init_state == 2) &&
+            arm_head->write_addr != 0xa5a5a5a5 &&
+            arm_head->read_addr != 0xa5a5a5a5) {
+
+            // If host is in re-init state (2), the DSP should acknowledge this
+            // by setting the host's state back to 1.
+            // Note: This involves the DSP writing to the ARM's control block,
+            // which can be risky if not handled carefully in the ARM code.
+            if (arm_head->init_state == 2) {
+                arm_head->init_state = 1;
+            }
+
+            // Initialize the DSP's own message head.
+            // The read and write pointers start at the beginning of the data area.
+            dsp_head->read_addr = MIN_ADDR;
+            dsp_head->write_addr = MIN_ADDR;
+
+            // Signal to the ARM host that the DSP is initialized.
+            dsp_head->init_state = 1;
+
+            break; // Exit the loop as we are initialized.
+        }
+
+        // Depending on the system, a small delay or a task yield might be
+        // needed here to prevent busy-spinning too fast.
     }
-
-    // 2. Initialize the DSP's own message head.
-    // The read and write pointers start at the beginning of the data area.
-    dsp_head->read_addr = MIN_ADDR;
-    dsp_head->write_addr = MIN_ADDR;
-
-    // 3. Signal to the ARM host that the DSP is initialized.
-    dsp_head->init_state = 1;
 }
 
 int kbuf_read_from_host(void* out_buffer, int max_len) {
@@ -123,7 +141,11 @@ int kbuf_write_to_host(const void* data, int len) {
     // The host's `msgbox_send_signal` expects the ARM's read and write addresses.
     // From the DSP's perspective, these are the DSP's write and read addresses respectively.
 
-    // Skip this for now! Sims said it might be okay *cries in concurrency errors*
+    // IMPORTANT: Signal the host that new data is available.
+    // The arguments are the DSP's current read and write addresses,
+    // which the host will interpret as its own write and read addresses, respectively.
+
+    // PD: Skip this for now! Sims said it might be okay *cries in concurrency errors*
     //rpmsg_signal_host((uint16_t)dsp_head->read_addr, (uint16_t)dsp_head->write_addr);
 
     return 0;

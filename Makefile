@@ -54,7 +54,7 @@ LIBS =  -L ./lib/  -lxtutil  -lhandler-reset -lc -lgloss -lhal -lm -lgcc -lc
 
 APP_SRC := src/main
 APP_SRC += src/kbuf
-APP_SRC += src/hal_msgbox src/msgboxx src/share_space
+#APP_SRC += src/hal_msgbox src/msgboxx src/share_space
 #APP_SRC += src/rpmsg
 
 BENCHMARK_SRC := benchmark/linpack-pc
