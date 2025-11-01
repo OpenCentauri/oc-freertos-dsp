@@ -1,6 +1,7 @@
 #include "platform.h"
 #include "sharespace.h"
 #include <string.h> // For memcpy and memset
+#include <stdio.h>
 
 // Pointers to the shared memory regions.
 static volatile uint8_t* dsp_reads_from_arm = NULL; // ARM writes here, DSP reads from here.
@@ -11,19 +12,18 @@ static volatile MsgHead* arm_head_ptr = NULL;   // Head for the ARM->DSP buffer.
 static volatile MsgHead* dsp_head_ptr = NULL;   // Head for the DSP->ARM buffer.
 
 // Global instance to store the discovered shared space parameters
-static dts_sharespace_t dts_sharespace;
+static struct dts_sharespace_t dts_sharespace;
 
-// Declare platform_head as extern, as it's defined elsewhere
-extern volatile spare_rtos_head_t *platform_head;
+// platform_head is defined as a macro in platform.h
 
 // This is a placeholder for the hardware-specific function that will trigger
 // an RPMsg interrupt to notify the host that new data is available.
 extern void rpmsg_signal_host(uint32_t msg);
 
 // Gets the initial shared memory configuration from the platform header.
-static void sharespace_get_config(dts_sharespace_t *p_dts_sharespace) {
-    volatile spare_rtos_head_t *pstr = platform_head;
-    volatile dts_msg_t *pdts = &pstr->rtos_img_hdr.dts_msg;
+static void sharespace_get_config(struct dts_sharespace_t *p_dts_sharespace) {
+    volatile struct spare_rtos_head_t *pstr = platform_head;
+    volatile struct dts_msg_t *pdts = &pstr->rtos_img_hdr.dts_msg;
     if (pdts->dts_sharespace.status == DTS_OPEN) {
         p_dts_sharespace->dsp_write_addr = pdts->dts_sharespace.dsp_write_addr;
         p_dts_sharespace->dsp_write_size = pdts->dts_sharespace.dsp_write_size;
@@ -32,6 +32,30 @@ static void sharespace_get_config(dts_sharespace_t *p_dts_sharespace) {
         p_dts_sharespace->dsp_log_addr = pdts->dts_sharespace.dsp_log_addr;
         p_dts_sharespace->dsp_log_size = pdts->dts_sharespace.dsp_log_size;
     }
+}
+
+// Fake init function to call from DSP boot-up to check on some stuff
+void sharespace_fake_init(void) {
+    sharespace_get_config(&dts_sharespace);
+    printf("DTS Sharespace Configuration:\n");
+    printf("  DSP Write Address: 0x%x\n", dts_sharespace.dsp_write_addr);
+    printf("  DSP Write Size:    0x%x\n", dts_sharespace.dsp_write_size);
+    printf("  ARM Write Address: 0x%x\n", dts_sharespace.arm_write_addr);
+    printf("  ARM Write Size:    0x%x\n", dts_sharespace.arm_write_size);
+    printf("  DSP Log Address:   0x%x\n", dts_sharespace.dsp_log_addr);
+    printf("  DSP Log Size:      0x%x\n", dts_sharespace.dsp_log_size);
+    dsp_reads_from_arm = (volatile uint8_t*)dts_sharespace.arm_write_addr;
+    dsp_writes_to_arm = (volatile uint8_t*)dts_sharespace.dsp_write_addr;
+    printf("Initialized Shared Memory Pointers:\n");
+    printf("  DSP Reads from ARM: %p\n", (void*)dsp_reads_from_arm);
+    printf("  DSP Writes to ARM:  %p\n", (void*)dsp_writes_to_arm);
+    arm_head_ptr = (volatile MsgHead*)(dsp_reads_from_arm + SHARE_SPACE_HEAD_OFFSET);
+    dsp_head_ptr = (volatile MsgHead*)(dsp_writes_to_arm + SHARE_SPACE_HEAD_OFFSET);
+    printf("Initialized Message Head Pointers:\n");
+    printf("  ARM Head Pointer: %p\n", (void*)arm_head_ptr);
+    printf("  DSP Head Pointer: %p\n", (void*)dsp_head_ptr);
+    printf("DONE DSP INIT!\n");
+    return;
 }
 
 // Waits for the ARM core to initialize its side of the shared memory.
@@ -51,12 +75,6 @@ static void sharespace_reinit(void) {
             break; // Sync complete
         }
     }
-}
-
-// Invalidates the ARM's message head in shared memory.
-void sharespace_clear(void) {
-    sharespace_get_config(&dts_sharespace);
-    memset((void*)(dts_sharespace.arm_write_addr + SHARE_SPACE_HEAD_OFFSET), 0xa5, sizeof(MsgHead));
 }
 
 // Main initialization function for the shared memory communication.
@@ -84,6 +102,12 @@ void sharespace_init(void) {
             break;
         }
     }
+}
+
+// Invalidates the ARM's message head in shared memory.
+void sharespace_clear(void) {
+    sharespace_get_config(&dts_sharespace);
+    memset((void*)(dts_sharespace.arm_write_addr + SHARE_SPACE_HEAD_OFFSET), 0xa5, sizeof(MsgHead));
 }
 
 int sharespace_write(const void* data, int len) {

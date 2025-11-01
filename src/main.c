@@ -47,6 +47,7 @@ void vTaskMain(void *pvParameters) {
  *  Function to print banner
  */
 void print_banner(void) {
+    // Print the banner
     printf("\n\n");
     printf("  ___                    ____           _                   _              \n");
     printf(" / _ \\ _ __   ___ _ __  / ___|___ _ __ | |_ __ _ _   _ _ __(_)            \n");
@@ -57,6 +58,9 @@ void print_banner(void) {
     printf("===========================================================================\n");
     printf(" OpenCentauri FreeRTOS for HIFI4 DSP v0.0.0, Build on xtensa-hifi4-elf-gcc \n");
     printf("===========================================================================\n");
+    // Print the address stored IN the pointer (the address of myVariable)
+    printf("Address of *_oemhead_text_start: %p\n\n", (void*)_oemhead_text_start);
+    sharespace_fake_init();
 }
 
 /*

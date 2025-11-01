@@ -26,9 +26,8 @@ typedef struct __attribute__((packed)) {
 
 // DTS Sharespace definitions
 
-
-
 // Function prototypes
+void sharespace_fake_init(void);
 void sharespace_init(void);
 void sharespace_clear(void);
 int sharespace_write(const void* data, int len);
