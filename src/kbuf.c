@@ -9,6 +9,27 @@ static volatile uint8_t* dsp_write_buffer = NULL; // DSP writes here, ARM reads 
 static volatile MsgHead* arm_head = NULL;   // Control block for the dsp_read_buffer.
 static volatile MsgHead* dsp_head = NULL;   // Control block for the dsp_write_buffer.
 
+// Global instance to store the discovered shared space parameters
+static dts_sharespace_t dts_sharespace_params;
+
+// Declare platform_head as extern, as it's defined elsewhere
+extern volatile spare_rtos_head_t *platform_head;
+
+static void sharespace_init(dts_sharespace_t *p_dts_sharespace) {
+    volatile spare_rtos_head_t *pstr = platform_head;
+    volatile dts_msg_t *pdts = &pstr->rtos_img_hdr.dts_msg;
+    int val = 0;
+    val = pdts->dts_sharespace.status;
+    if (val == DTS_OPEN) {
+        p_dts_sharespace->dsp_write_addr = pdts->dts_sharespace.dsp_write_addr;
+        p_dts_sharespace->dsp_write_size = pdts->dts_sharespace.dsp_write_size;
+        p_dts_sharespace->arm_write_addr = pdts->dts_sharespace.arm_write_addr;
+        p_dts_sharespace->arm_write_size = pdts->dts_sharespace.arm_write_size;
+        p_dts_sharespace->dsp_log_addr = pdts->dts_sharespace.dsp_log_addr;
+        p_dts_sharespace->dsp_log_size = pdts->dts_sharespace.dsp_log_size;
+    }
+}
+
 // This is a placeholder for the hardware-specific function that will trigger
 // an RPMsg interrupt to notify the host that new data is available.
 // You must implement this function based on your DSP's platform specifics.
@@ -149,4 +170,13 @@ int kbuf_write_to_host(const void* data, int len) {
     //rpmsg_signal_host((uint16_t)dsp_head->read_addr, (uint16_t)dsp_head->write_addr);
 
     return 0;
+}
+
+void kbuf_system_init(void) {
+    // First, initialize the shared space parameters from the platform head.
+    sharespace_init(&dts_sharespace_params);
+
+    // Then, initialize the kbuf buffers using the discovered ARM write address
+    // as the base for the shared memory.
+    kbuf_init((void*)dts_sharespace_params.arm_write_addr);
 }
