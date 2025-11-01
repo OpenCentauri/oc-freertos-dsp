@@ -92,10 +92,30 @@ void vTaskMain(void *pvParameters) {
 int main(void) {
     xTaskHandle xHandleTaskMain;
 
+    /*
     // Crappy usleep() before printing banner
     //for(unsigned int i=0;i<100000000;++i);
 
     print_banner();
+
+    const int maxsize = 1024;
+    char outbuf[maxsize];
+
+    char* msg = "Hello, World";
+    int ret;
+
+    // Initialize the shared memory communication
+    sharespace_init();
+
+    for(unsigned int i=0;;++i) {
+        snprintf(outbuf, maxsize, "%s: %u\n", msg, i);
+        ret = sharespace_write(outbuf, strlen(outbuf)+1);
+        for(unsigned int j=2;j>=2;++j) ;
+        // Delay until overflow of unsigned int, then continue
+    }
+
+    // Never get here
+    */
 
     xTaskCreate(vTaskMain, "Task Main", 4096, NULL, 1, &xHandleTaskMain);
     printf("vTaskStartScheduler\n");
