@@ -2,7 +2,7 @@
 #include "sharespace.h"
 #include <string.h> // For memcpy and memset
 #include <stdio.h>
-//#include <xtensa/hal.h>
+#include <xtensa/hal.h>
 
 // Pointers to the shared memory regions.
 static volatile uint8_t* dsp_reads_from_arm = NULL; // ARM writes here, DSP reads from here.
@@ -12,8 +12,13 @@ static volatile uint8_t* dsp_writes_to_arm = NULL;  // DSP writes here, ARM read
 static volatile MsgHead* arm_head_ptr = NULL;   // Head for the ARM->DSP buffer.
 static volatile MsgHead* dsp_head_ptr = NULL;   // Head for the DSP->ARM buffer.
 
+// Address to track the arm and dsp read/write location
+uint16_t sharespace_arm_addr[2];
+uint16_t sharespace_dsp_addr[2];
+
 // Global instance to store the discovered shared space parameters
 static struct dts_sharespace_t dts_sharespace;
+static struct dts_sharespace_t mmap_sharespace;
 
 // platform_head is defined as a macro in platform.h
 
@@ -55,23 +60,26 @@ void sharespace_fake_init(void) {
     printf("Initialized Message Head Pointers:\n");
     printf("  ARM Head Pointer: %p\n", (void*)arm_head_ptr);
     printf("  DSP Head Pointer: %p\n", (void*)dsp_head_ptr);
+    /*char[] msg="This is a test of the emergency buffer initialization system. This is only a test!";
+    memcpy((void*)(dsp_writes_to_arm + MIN_ADDR), msg, strlen(msg)+1);
+    printf("Initializing DSP head buffer (%p) to string (%d bytes):\n%s\n", (void*)dsp_head_ptr, strlen(msg)+1, msg);*/
     printf("DONE DSP FAKEINIT!\n");
     return;
 }
 
 // Waits for the ARM core to initialize its side of the shared memory.
 static void sharespace_reinit(void) {
-    MsgHead temp_arm_head;
+    MsgHead arm_head;
     while (1) {
-        memcpy(&temp_arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
+        memcpy(&arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
 
-        if ((temp_arm_head.init_state == 1 || temp_arm_head.init_state == 2) &&
-            temp_arm_head.write_addr != 0xa5a5a5a5 &&
-            temp_arm_head.read_addr != 0xa5a5a5a5) {
+        if ((arm_head.init_state == 1 || arm_head.init_state == 2) &&
+            arm_head.write_addr != 0xa5a5a5a5 &&
+            arm_head.read_addr != 0xa5a5a5a5) {
 
-            if (temp_arm_head.init_state == 2) {
-                temp_arm_head.init_state = 1;
-                memcpy((void*)arm_head_ptr, &temp_arm_head, sizeof(MsgHead));
+            if (arm_head.init_state == 2) {
+                arm_head.init_state = 1;
+                memcpy((void*)arm_head_ptr, &arm_head, sizeof(MsgHead));
             }
             break; // Sync complete
         }
@@ -90,17 +98,30 @@ void sharespace_init(void) {
 
     sharespace_reinit();
 
-    MsgHead dsp_head = { .read_addr = MIN_ADDR, .write_addr = MIN_ADDR, .init_state = 1 };
+    // Not sure what these do
+    //read_p = (volatile uint8_t *)(mmap_sharespace.arm_write_addr  );
+    //write_p = (volatile uint8_t *)(mmap_sharespace.dsp_write_addr );
+
+    MsgHead dsp_head = {
+        .read_addr = MIN_ADDR,
+        .write_addr = MIN_ADDR,
+        .init_state = 1
+    };
+    sharespace_dsp_addr[SHARESPACE_READ] = dsp_head.read_addr;
+    sharespace_dsp_addr[SHARESPACE_WRITE] = dsp_head.write_addr;
+
     memcpy((void*)dsp_head_ptr, &dsp_head, sizeof(MsgHead));
     //xthal_dcache_region_writeback((void*)dsp_head_ptr, sizeof(MsgHead));
 
-    uint32_t signal_msg = (dsp_head.write_addr << 16) | dsp_head.read_addr;
+    //uint32_t signal_msg = (dsp_head.write_addr << 16) | dsp_head.read_addr;
     //rpmsg_signal_host(signal_msg);
 
-    MsgHead temp_arm_head;
+    MsgHead arm_head;
     while (1) {
-        memcpy(&temp_arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
-        if (temp_arm_head.init_state == 1) {
+        memcpy(&arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
+        if (arm_head.init_state == 1) {
+            sharespace_arm_addr[SHARESPACE_READ] = arm_head.read_addr;
+            sharespace_arm_addr[SHARESPACE_WRITE] = arm_head.write_addr;
             break;
         }
     }

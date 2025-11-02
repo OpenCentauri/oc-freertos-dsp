@@ -1,10 +1,33 @@
-#ifndef KBUF_H
-#define KBUF_H
+#ifndef SHARESPACE_H
+#define SHARESPACE_H
 
 #include <stdint.h>
 
 // Total size of one-way buffer region.
 #define BUFFER_SIZE 4096
+
+#define SYS_IDLE_STATE           0xcbda0001
+#define DSP_READ_STATE           0xcbda0002
+#define DSP_WRITE_STATE          0xcbda0003
+#define ARM_READ_STATE           0xcbda0004
+#define ARM_WRITE_STATE          0xcbda0005
+#define SHARESPACE_READ          0
+#define SHARESPACE_WRITE         1
+
+extern uint16_t sharespace_arm_addr[2];
+extern uint16_t sharespace_dsp_addr[2];
+
+#define MESSAGE_MAX 64
+#define MAX_PENDING_BLOCKS 12
+struct receive_msg_block{
+    int msg_len;
+    char buf[MESSAGE_MAX];
+    struct receive_msg_block *next;
+};
+
+struct receive_msg_queue {
+    struct receive_msg_block *front, *rear;
+};
 
 // Define the structure for the message head, matching the ARM side.
 // The order of fields is critical for memory layout compatibility.
@@ -33,4 +56,4 @@ void sharespace_clear(void);
 int sharespace_write(const void* data, int len);
 int sharespace_read(void* out_buffer, int max_len);
 
-#endif // KBUF_H
+#endif // SHARESPACE_H

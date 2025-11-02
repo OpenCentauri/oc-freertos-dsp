@@ -15,6 +15,7 @@
 #include "platform.h"
 #include "sharespace.h"
 #include "task.h"
+#include "log.h"
 
 /*
  *  External function prototypes
@@ -61,6 +62,7 @@ void print_banner(void) {
     // Print the address stored IN the pointer (the address of myVariable)
     printf("Address of *_oemhead_text_start: %p\n\n", (void*)_oemhead_text_start);
     sharespace_fake_init();
+    log_fake_init();
 }
 
 /*
@@ -79,8 +81,10 @@ void vTaskMain(void *pvParameters) {
     sharespace_init();
 
     for(unsigned int i=0;;++i) {
-        snprintf(outbuf, maxsize, "%s: %u\n", msg, i);
-        sharespace_write(outbuf, strlen(outbuf)+1);
+        lprintf("%s: %u\n", msg, i);
+        //snprintf(outbuf, maxsize, "%s: %u\n", msg, i);
+        //sharespace_write(outbuf, strlen(outbuf)+1);
+        //sharespace_write(outbuf, strlen(outbuf)+1);
         // Check ret to make sure the write was successful! Or not...
         vTaskDelay(1000);
     }
@@ -117,6 +121,9 @@ int main(void) {
     // Never get here
     */
     print_banner();
+
+    log_init();
+    lprintf("This is a test log message from the DSP.");
 
     xTaskCreate(vTaskMain, "Task Main", 4096, NULL, 1, &xHandleTaskMain);
     printf("vTaskStartScheduler\n");
