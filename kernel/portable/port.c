@@ -57,6 +57,7 @@
 
 #include "xtensa_rtos.h"
 #include "FreeRTOS.h"
+#include "timer.h"
 #include "task.h"
 
 /* Defined in portasm.h */
@@ -174,8 +175,10 @@ BaseType_t xPortStartScheduler(void) {
   /* Init the tick divisor value */
   _xt_tick_divisor_init();
 
+  timer_init();
+
   /* Setup the hardware to generate the tick. */
-  _frxt_tick_timer_init();
+  //_frxt_tick_timer_init();
 
 #if XT_USE_THREAD_SAFE_CLIB
   // Init C library
