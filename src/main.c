@@ -39,7 +39,7 @@ void hw_usleep(uint32_t usec) {
  */
 void print_banner(void) {
     // Print the banner
-    printf("\n\n");
+    printf("                                                                           \n");
     printf("  ___                    ____           _                   _              \n");
     printf(" / _ \\ _ __   ___ _ __  / ___|___ _ __ | |_ __ _ _   _ _ __(_)            \n");
     printf("| | | | '_ \\ / _ \\ '_ \\| |   / _ \\ '_ \\| __/ _` | | | | '__| |        \n");
