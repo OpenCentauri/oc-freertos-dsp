@@ -68,7 +68,8 @@ void sharespace_fake_init(void) {
 }
 
 // Waits for the ARM core to initialize its side of the shared memory.
-static void sharespace_reinit(void) {
+//static void sharespace_reinit(void) {
+static uint32_t sharespace_reinit(void) {
     MsgHead arm_head;
     while (1) {
         memcpy(&arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
@@ -81,7 +82,9 @@ static void sharespace_reinit(void) {
                 arm_head.init_state = 1;
                 memcpy((void*)arm_head_ptr, &arm_head, sizeof(MsgHead));
             }
-            break; // Sync complete
+            // Sync complete
+            //break;
+            return arm_head.read_addr;
         }
     }
 }
@@ -96,7 +99,8 @@ void sharespace_init(void) {
     arm_head_ptr = (volatile MsgHead*)(dsp_reads_from_arm + SHARE_SPACE_HEAD_OFFSET);
     dsp_head_ptr = (volatile MsgHead*)(dsp_writes_to_arm + SHARE_SPACE_HEAD_OFFSET);
 
-    sharespace_reinit();
+    // sharespace_reinit();
+    dsp_head_ptr = (volatile MsgHead*)(sharespace_reinit() + SHARE_SPACE_HEAD_OFFSET);
 
     // Not sure what these do
     //read_p = (volatile uint8_t *)(mmap_sharespace.arm_write_addr  );
@@ -107,8 +111,8 @@ void sharespace_init(void) {
         .write_addr = MIN_ADDR,
         .init_state = 1
     };
-    sharespace_dsp_addr[SHARESPACE_READ] = dsp_head.read_addr;
-    sharespace_dsp_addr[SHARESPACE_WRITE] = dsp_head.write_addr;
+    //sharespace_dsp_addr[SHARESPACE_READ] = dsp_head.read_addr;
+    //sharespace_dsp_addr[SHARESPACE_WRITE] = dsp_head.write_addr;
 
     memcpy((void*)dsp_head_ptr, &dsp_head, sizeof(MsgHead));
     //xthal_dcache_region_writeback((void*)dsp_head_ptr, sizeof(MsgHead));
