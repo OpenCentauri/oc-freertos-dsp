@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+//#include <sys/unistd.h>
+#include <time.h>
 #include <xtensa/config/core-matmap.h>
 #include <xtensa/config/core.h>
 #include <xtensa/core-macros.h>
@@ -23,6 +25,14 @@
 extern int linpack_main(void);
 extern int dhry_main(int t);
 extern void coremark_main(void);
+
+// Janky HW usleep() function using clock ticks!
+void hw_usleep(uint32_t usec) {
+    volatile uint32_t count = (configCPU_CLOCK_HZ / 1000000) * usec;
+    while (count--) {
+        __asm__ volatile ("nop");
+    }
+}
 
 /*
 // Original FreeRTOS Hifi4 main task, kept for reference
@@ -77,7 +87,11 @@ void vTaskMain(void *pvParameters) {
     char* msg = "Hello, World";
     //int ret;
 
-    // Initialize the shared memory communication
+    // Initialize the logging system kbuf shared memory
+    log_init();
+    lprintf("This is a test log message from the DSP.");
+
+    // Initialize the kbuf shared memory communication
     sharespace_init();
 
     for(unsigned int i=0;;++i) {
@@ -96,12 +110,29 @@ void vTaskMain(void *pvParameters) {
 int main(void) {
     xTaskHandle xHandleTaskMain;
 
-    /*
-    // Crappy usleep() before printing banner
-    //for(unsigned int i=0;i<100000000;++i);
-
+    hw_usleep(200);
     print_banner();
 
+    // Initialize the logging system kbuf shared memory
+    log_init();
+    lprintf("This is a test log message from the DSP.");
+
+    char* msg = "Hello, World";
+    struct timespec request;
+    struct timespec remaining; // Store remaining time if interrupted
+    int ret;
+
+    // Initialize the kbuf shared memory communication
+    sharespace_init();
+
+    for(unsigned int i=0;;++i) {
+        lprintf("%s: %u\n", msg, i);
+        hw_usleep(1000);
+    }
+
+/*
+    // Initialize the shared memory communication
+    //sharespace_init();
     const int maxsize = 1024;
     char outbuf[maxsize];
 
@@ -117,13 +148,9 @@ int main(void) {
         for(unsigned int j=2;j>=2;++j) ;
         // Delay until overflow of unsigned int, then continue
     }
+*/
 
-    // Never get here
-    */
     print_banner();
-
-    log_init();
-    lprintf("This is a test log message from the DSP.");
 
     xTaskCreate(vTaskMain, "Task Main", 4096, NULL, 1, &xHandleTaskMain);
     printf("vTaskStartScheduler\n");
