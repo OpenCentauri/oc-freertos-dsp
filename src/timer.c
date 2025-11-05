@@ -2,6 +2,7 @@
 #include "platform.h"
 #include "FreeRTOSConfig.h"
 #include "xtensa_api.h"
+#include "log.h"
 
 #define RWDOG_BASE 0x01701000
 #define RWDOG_MODE_REG (RWDOG_BASE + 0x0018)
@@ -17,23 +18,29 @@ void timer1_interrupt_handler(void);
 extern void xPortSysTickHandler(void);
 
 void timer_init(void) {
-    // Disable the watchdog timer
+    lprintf("timer_init: Disabling watchdog timer...\n");
     writel(RWDOG_MODE_REG, readl(RWDOG_MODE_REG) & ~1);
+    lprintf("timer_init: RWDOG_MODE_REG = 0x%x\n", readl(RWDOG_MODE_REG));
 
-    // Set the timer interval
+    lprintf("timer_init: Setting timer interval...\n");
     writel(TIMER1_INTV_REG, (configCPU_CLOCK_HZ / configTICK_RATE_HZ));
+    lprintf("timer_init: TIMER1_INTV_REG = 0x%x\n", readl(TIMER1_INTV_REG));
 
-    // Enable the timer and set it to periodic mode
+    lprintf("timer_init: Enabling timer...\n");
     writel(TIMER1_CTRL_REG, (1 << 0) | (1 << 1));
+    lprintf("timer_init: TIMER1_CTRL_REG = 0x%x\n", readl(TIMER1_CTRL_REG));
 
-    // Enable the timer interrupt
+    lprintf("timer_init: Enabling timer interrupt...\n");
     writel(TIMER_IRQ_EN_REG, readl(TIMER_IRQ_EN_REG) | (1 << 1));
+    lprintf("timer_init: TIMER_IRQ_EN_REG = 0x%x\n", readl(TIMER_IRQ_EN_REG));
 
-    // Register the interrupt handler
+    lprintf("timer_init: Registering interrupt handler...\n");
     xt_set_interrupt_handler(19, (xt_handler)timer1_interrupt_handler, NULL);
+    lprintf("timer_init: Interrupt handler registered.\n");
 }
 
 void timer1_interrupt_handler(void) {
+    lprintf("timer1_interrupt_handler: Interrupt received!\n");
     // Clear the timer interrupt pending bit
     writel(TIMER_IRQ_STA_REG, (1 << 1));
 
