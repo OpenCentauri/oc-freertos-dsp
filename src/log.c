@@ -37,6 +37,7 @@ void log_init(void) {
         log_write_ptr = (volatile uint32_t*)log_buffer;
         log_clear();
     }
+    lprintf("DSP logging kbuf initialized!\n");
 }
 
 void log_clear(void) {

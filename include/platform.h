@@ -37,6 +37,11 @@
 
 #define SUNXI_GPIO_BASE 0x2000000
 
+#define SUNXI_CCU_BASE        0x02001000UL
+#define SUNXI_DSP_CLK_REG     (SUNXI_CCU_BASE + 0x0C70)
+
+#define SUNXI_HOSC_FREQ       24000000UL    // 24 MHz
+
 /*
  * OpenCentauri: From the CC Linux Device Tree:
  * share_space@0x42100000 {
@@ -219,6 +224,7 @@ struct spare_rtos_head_t {
 extern char *_oemhead_text_start;
 #define platform_head ((struct spare_rtos_head_t *)&_oemhead_text_start)
 
+extern uint32_t xtbsp_clock_freq_hz(void);
 extern void dsp_msgbox_init(void (*rxcb)(uint32_t, uint32_t));
 extern void dsp_msgbox_channel_send(uint32_t ch, uint8_t *bf, uint32_t len);
 

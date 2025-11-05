@@ -1,8 +1,10 @@
+#include <stdio.h>
+#include <string.h> // For memcpy and memset
+#include <xtensa/hal.h>
+
 #include "platform.h"
 #include "sharespace.h"
-#include <string.h> // For memcpy and memset
-#include <stdio.h>
-#include <xtensa/hal.h>
+#include "log.h"
 
 // Pointers to the shared memory regions.
 static volatile uint8_t* dsp_reads_from_arm = NULL; // ARM writes here, DSP reads from here.
@@ -15,6 +17,7 @@ static volatile MsgHead* dsp_head_ptr = NULL;   // Head for the DSP->ARM buffer.
 // Address to track the arm and dsp read/write location
 uint16_t sharespace_arm_addr[2];
 uint16_t sharespace_dsp_addr[2];
+uint16_t sharespace_log_addr[2];
 
 // Global instance to store the discovered shared space parameters
 static struct dts_sharespace_t dts_sharespace;
@@ -63,7 +66,7 @@ void sharespace_fake_init(void) {
     /*char[] msg="This is a test of the emergency buffer initialization system. This is only a test!";
     memcpy((void*)(dsp_writes_to_arm + MIN_ADDR), msg, strlen(msg)+1);
     printf("Initializing DSP head buffer (%p) to string (%d bytes):\n%s\n", (void*)dsp_head_ptr, strlen(msg)+1, msg);*/
-    printf("DONE DSP FAKEINIT!\n");
+    printf("DONE DSP FAKEINIT!\n\n");
     return;
 }
 
@@ -97,7 +100,7 @@ void sharespace_init(void) {
     dsp_writes_to_arm = (volatile uint8_t*)dts_sharespace.dsp_write_addr;
 
     arm_head_ptr = (volatile MsgHead*)(dsp_reads_from_arm + SHARE_SPACE_HEAD_OFFSET);
-    dsp_head_ptr = (volatile MsgHead*)(dsp_writes_to_arm + SHARE_SPACE_HEAD_OFFSET);
+    //dsp_head_ptr = (volatile MsgHead*)(dsp_writes_to_arm + SHARE_SPACE_HEAD_OFFSET);
 
     // sharespace_reinit();
     dsp_head_ptr = (volatile MsgHead*)(sharespace_reinit() + SHARE_SPACE_HEAD_OFFSET);

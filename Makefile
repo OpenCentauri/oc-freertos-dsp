@@ -39,7 +39,7 @@ DFLAGS += -DXTUTIL_NO_OVERRIDE
 DFLAGS += -DMAIN_HAS_NOARGC
 DFLAGS += -DPERFORMANCE_RUN=1 -DITERATIONS=23000
 # Enable use SW timers
-DFLAGS += -DconfigUSE_TIMERS
+#DFLAGS += -DconfigUSE_TIMERS
 
 CFLAGS  := -Wa,--longcalls -static -O2  -Wall -mtext-section-literals  -fno-inline-functions
 CFLAGS  += -ffunction-sections -fdata-sections  -mlongcalls  $(DFLAGS) $(IFLAGS)
