@@ -2,10 +2,14 @@
 #include <xtensa/config/core-matmap.h>
 #include <xtensa/config/core.h>
 #include <xtensa/core-macros.h>
-#include <xtensa/hal.h>
 #include <xtensa/tie/xt_externalregisters.h>
+#include <xtensa/tie/xt_interrupt.h>
+#include <xtensa/tie/xt_timer.h>
 #include <xtensa/xtruntime.h>
+#include <xtensa/hal.h>
 
+#include "xtensa_api.h"
+#include "xtensa_timer.h"
 #include "platform.h"
 
 static void _cache_config(void) {
@@ -98,12 +102,6 @@ struct intc_regs {
     volatile uint32_t group_config2;
     volatile uint32_t group_config3;
 };
-
-#include <xtensa/tie/xt_interrupt.h>
-#include <xtensa/tie/xt_timer.h>
-#include "xtensa_timer.h"
-#include "xtensa_api.h"
-#include <xtensa/tie/xt_interrupt.h>
 
 static volatile struct intc_regs *(pintc_regs) = (volatile struct intc_regs *)
         SUNXI_R_INTC_PBASE;
