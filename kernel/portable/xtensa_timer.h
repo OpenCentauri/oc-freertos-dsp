@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2015-2019 Cadence Design Systems, Inc.
  *
@@ -129,8 +130,7 @@ Adjust this frequency to taste (it's not real-time anyway!).
 #endif
 
 #if !defined(XT_CLOCK_FREQ) && !defined(XT_BOARD)
-#define XT_CLOCK_FREQ configCPU_CLOCK_HZ
-//#error "XT_CLOCK_FREQ must be defined for the target platform."
+#error "XT_CLOCK_FREQ must be defined for the target platform."
 #endif
 
 /*
