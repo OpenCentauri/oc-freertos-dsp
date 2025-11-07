@@ -105,9 +105,104 @@ struct intc_regs {
 
 static volatile struct intc_regs *(pintc_regs) = (volatile struct intc_regs *)
         SUNXI_R_INTC_PBASE;
+
+#define writel(v, a) (*(volatile unsigned int *)(a) = (v))
+#define readl(a) (*(volatile unsigned int *)(a))
+
+#define SUNXI_CCU_BASE      0x02001000
+#define SUNXI_R_CCU_BASE    0x07010000
+#define SUNXI_RTC_CCU_REG   0x07090000
+
+/* Main CCU registers */
+#define SUN8IW20_PLL_CPUX_REG       0x000
+#define SUN8IW20_PLL_DDR0_REG       0x010
+#define SUN8IW20_PLL_PERIPH0_REG    0x020
+#define SUN8IW20_PLL_VIDEO0_REG     0x040
+#define SUN8IW20_PLL_VIDEO1_REG     0x048
+#define SUN8IW20_PLL_VE_REG         0x058
+#define SUN8IW20_PLL_AUDIO0_REG     0x078
+#define SUN8IW20_PLL_AUDIO1_REG     0x080
+#define SUN8IW20_USB0_CLK_REG       0xa70
+#define SUN8IW20_USB1_CLK_REG       0xa74
+#define DSP_CLK_REG                 0xc70
+
+/* RTC CCU registers */
+#define LOSC_CTRL_REG               0x00
+#define KEY_FIELD_MAGIC_NUM_RTC     0x16AA0000
+#define LOSC_OUT_GATING_REG         0x60
+#define XO_CTRL_REG                 0x160
+
+#define BIT(nr)         (1UL << (nr))
+#define GENMASK(h, l) \
+    (((~0UL) << (l)) & (~0UL >> (32 - 1 - (h))))
+
+static void set_reg_key(unsigned long addr, unsigned int key,
+                               unsigned int kstart, unsigned int klen,
+                               unsigned int val, unsigned int vstart,
+                               unsigned int vlen)
+{
+    unsigned int temp;
+
+    temp = readl(addr);
+    temp &= ~(((1 << klen) - 1) << kstart);
+    temp &= ~(((1 << vlen) - 1) << vstart);
+    temp |= (key << kstart);
+    temp |= (val << vstart);
+    writel(temp, addr);
+}
+
+static void clock_init(void)
+{
+    volatile uint32_t val;
+    int i;
+
+    /* This is based on sunxi_ccu_init from rtos-hal */
+
+    /* Enable the lock bits on all Plls */
+    const uint32_t pll_regs[] = {
+        SUN8IW20_PLL_CPUX_REG, SUN8IW20_PLL_DDR0_REG,
+        SUN8IW20_PLL_PERIPH0_REG, SUN8IW20_PLL_VIDEO0_REG,
+        SUN8IW20_PLL_VIDEO1_REG, SUN8IW20_PLL_VE_REG,
+        SUN8IW20_PLL_AUDIO0_REG, SUN8IW20_PLL_AUDIO1_REG,
+    };
+
+    for (i = 0; i < sizeof(pll_regs)/sizeof(pll_regs[0]); i++) {
+        val = readl(SUNXI_CCU_BASE + pll_regs[i]);
+        val |= BIT(29);
+        writel(val, SUNXI_CCU_BASE + pll_regs[i]);
+    }
+
+    /* This is based on sunxi_rtc_ccu_init and clock_source_init from rtos-hal */
+    /* (1) enable DCXO */
+    val = readl(SUNXI_RTC_CCU_REG + XO_CTRL_REG);
+    val |= (1 << 1);
+    writel(val, SUNXI_RTC_CCU_REG + XO_CTRL_REG);
+
+    /* (2) enable auto switch function */
+    set_reg_key(SUNXI_RTC_CCU_REG + LOSC_CTRL_REG,
+                KEY_FIELD_MAGIC_NUM_RTC >> 16, 16, 16,
+                0x1, 2, 14);
+
+    /* (3) set the parent of osc32k-sys to ext-osc32k */
+    set_reg_key(SUNXI_RTC_CCU_REG + LOSC_CTRL_REG,
+                KEY_FIELD_MAGIC_NUM_RTC >> 16, 16, 16,
+                0x1, 1, 0);
+
+    /* (4) set the parent of osc32k-out to osc32k-sys */
+    val = readl(SUNXI_RTC_CCU_REG + LOSC_OUT_GATING_REG);
+    val &= ~GENMASK(1, 0);
+    writel(val, SUNXI_RTC_CCU_REG + LOSC_OUT_GATING_REG);
+
+    /* Configure DSP clock to 600MHz */
+    /* Set parent to pll-periph0-2x (1200MHz) and divider to 2 */
+    val = (1 << 31) | (3 << 24) | (1 << 0);
+    writel(val, SUNXI_CCU_BASE + DSP_CLK_REG);
+}
+
 void board_init(void) {
     _cache_config();
-    pintc_regs->enable = 0x0;
+
+    /*pintc_regs->enable = 0x0;
     pintc_regs->mask = 0x0;
     pintc_regs->pending = 0xffffffff;
 
@@ -117,9 +212,11 @@ void board_init(void) {
 
     pintc_regs->enable2 = 0x0;
     pintc_regs->mask2 = 0x0;
-    pintc_regs->pending2 = 0xffffffff;
+    pintc_regs->pending2 = 0xffffffff;*/
 
-    xt_ints_on(XT_TIMER_INTEN);
+    //clock_init();
+
+    //xt_ints_on(XT_TIMER_INTEN);
 }
 
 int outbyte(char c) {
