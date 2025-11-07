@@ -87,7 +87,7 @@ int main(void) {
     // Initialize the kbuf shared memory communication
     sharespace_init();
 
-    for(unsigned int i=0;i<20;++i) {
+    for(unsigned int i=0;i<12;++i) {
         lprintf("%s: %u\n", msg, i);
         hw_usleep(5000);
     }
