@@ -99,6 +99,12 @@ struct intc_regs {
     volatile uint32_t group_config3;
 };
 
+#include <xtensa/tie/xt_interrupt.h>
+#include <xtensa/tie/xt_timer.h>
+#include "xtensa_timer.h"
+#include "xtensa_api.h"
+#include <xtensa/tie/xt_interrupt.h>
+
 static volatile struct intc_regs *(pintc_regs) = (volatile struct intc_regs *)
         SUNXI_R_INTC_PBASE;
 void board_init(void) {
@@ -114,6 +120,8 @@ void board_init(void) {
     pintc_regs->enable2 = 0x0;
     pintc_regs->mask2 = 0x0;
     pintc_regs->pending2 = 0xffffffff;
+
+    xt_ints_on(XT_TIMER_INTEN);
 }
 
 int outbyte(char c) {

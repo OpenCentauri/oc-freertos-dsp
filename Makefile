@@ -154,7 +154,7 @@ $(BUILDDIR)/%.o: %.c
 	$(Q)$(CC) -c $(CFLAGS) -o $@ $<
 
 install:
-	scp build/dsp.elf carbon-dev:/mnt/exUDISK/
+	scp build/dsp.elf carbon-devu:/mnt/exUDISK/
 
 clean:
 	$(Q)rm -rf $(BUILDDIR)
