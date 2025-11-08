@@ -89,6 +89,10 @@ static void sharespace_reinit(MsgHead *p_arm_head) {
     while (1) {
         iteration++;
         lprintf("sharespace_reinit: Iteration %d - Reading ARM head from 0x%08x\n", iteration, (uint32_t)arm_head_ptr);
+        
+        // Invalidate cache before reading from shared memory
+        xthal_dcache_region_invalidate((void*)arm_head_ptr, sizeof(MsgHead));
+        
         memcpy(p_arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
         lprintf("sharespace_reinit: arm_head.init_state = %d\n", p_arm_head->init_state);
         lprintf("sharespace_reinit: arm_head.write_addr = 0x%08x\n", p_arm_head->write_addr);
@@ -167,6 +171,10 @@ void sharespace_init(void) {
     int poll_count = 0;
     while (1) {
         poll_count++;
+        
+        // Invalidate cache before reading from shared memory
+        xthal_dcache_region_invalidate((void*)arm_head_ptr, sizeof(MsgHead));
+        
         memcpy(&arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
         lprintf("sharespace_init: Poll #%d - ARM head (from kbuf): init_state=%d, read_addr=0x%04x, write_addr=0x%04x\n", 
                 poll_count, arm_head.init_state, arm_head.read_addr, arm_head.write_addr);
@@ -198,7 +206,11 @@ void sharespace_clear(void) {
     
     // Write the initialized structure to shared memory
     memcpy((void*)arm_head_ptr, &arm_head, sizeof(MsgHead));
-    lprintf("sharespace_clear: Wrote ARM head to 0x%08x.\n", (uint32_t)arm_head_ptr);
+    
+    // Flush cache to ensure ARM can see the changes
+    xthal_dcache_region_writeback((void*)arm_head_ptr, sizeof(MsgHead));
+    
+    lprintf("sharespace_clear: Wrote ARM head to 0x%08x and flushed cache.\n", (uint32_t)arm_head_ptr);
 }
 
 int sharespace_write(const void* data, int len) {

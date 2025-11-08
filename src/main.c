@@ -41,9 +41,12 @@ void print_banner(void) {
     printf("===========================================================================\n");
     printf(" OpenCentauri FreeRTOS for HIFI4 DSP v0.0.0, Build on xtensa-hifi4-elf-gcc \n");
     printf("===========================================================================\n");
-    // Print the address stored IN the pointer (the address of myVariable)
-    printf("Call xtbsp_clock_freq_hertz: %u Hz\n", (unsigned int)xtbsp_clock_freq_hz());
-    printf("Address of *_oemhead_text_start: %p\n\n", (void*)_oemhead_text_start);
+    printf("DSP Clock Frequency: %u Hz\n", (unsigned int)xtbsp_clock_freq_hz());
+    printf("OEM Header Address: %p\n", (void*)_oemhead_text_start);
+    printf("FreeRTOS Tick Rate: %d Hz (1 tick = %d ms)\n", configTICK_RATE_HZ, 1000/configTICK_RATE_HZ);
+    printf("Platform: Allwinner R528 SoC\n");
+    printf("---------------------------------------------------------------------------\n");
+    printf("Initializing shared memory regions...\n\n");
     sharespace_fake_init();
 }
 
@@ -53,10 +56,10 @@ void print_banner(void) {
 void vTaskMain(void *pvParameters) {
     (void) pvParameters;
 
-    //printf("Bob Dole Lives!!!\n");
+    lprintf("vTaskMain: Task started, entering main loop.\n");
     for(unsigned int i=0;;++i) {
         lprintf("vTaskMain loop: %u\n", i);
-        vTaskDelay(1000);
+        vTaskDelay(1000); // Delay 1000 ticks = 1 second (configTICK_RATE_HZ = 1000)
     }
 }
 
