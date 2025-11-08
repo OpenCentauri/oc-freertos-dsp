@@ -2,6 +2,7 @@
 #define SHARESPACE_H
 
 #include <stdint.h>
+#include "FreeRTOS.h"
 
 // Total size of one-way buffer region.
 #define BUFFER_SIZE 4096
@@ -46,10 +47,8 @@ typedef struct __attribute__((packed)) {
 // The data buffer ends just before the actual MsgHead at the end of the region.
 #define MAX_ADDR (BUFFER_SIZE - sizeof(MsgHead))
 
-
-// DTS Sharespace definitions
-
 // Function prototypes
+void hw_usleep(uint32_t usec);
 void sharespace_fake_init(void);
 void sharespace_init(void);
 void sharespace_clear(void);

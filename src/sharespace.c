@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h> // For memcpy and memset
+#include <stdint.h>
 #include <xtensa/hal.h>
 
 #include "platform.h"
@@ -28,6 +29,14 @@ static struct dts_sharespace_t mmap_sharespace;
 // This is a placeholder for the hardware-specific function that will trigger
 // an RPMsg interrupt to notify the host that new data is available.
 extern void rpmsg_signal_host(uint32_t msg);
+
+// Janky HW usleep() function using clock ticks!
+void hw_usleep(uint32_t usec) {
+    volatile uint32_t count = 5 * (configCPU_CLOCK_HZ / 1000000) * usec;
+    while (count--) {
+        __asm__ volatile ("nop");
+    }
+}
 
 // Gets the initial shared memory configuration from the platform header.
 static void sharespace_get_config(struct dts_sharespace_t *p_dts_sharespace) {
@@ -73,6 +82,7 @@ void sharespace_fake_init(void) {
 // Waits for the ARM core to initialize its side of the shared memory.
 static void sharespace_reinit(MsgHead *p_arm_head) {
     lprintf("sharespace_reinit: Waiting for ARM initialization...\n");
+    hw_usleep(10000); // sleep 10 seconds before looping
     while (1) {
         lprintf("sharespace_reinit: Reading ARM head from 0x%08x\n", (uint32_t)arm_head_ptr);
         memcpy(p_arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
@@ -88,6 +98,7 @@ static void sharespace_reinit(MsgHead *p_arm_head) {
             lprintf("sharespace_reinit: Sync complete.\n");
             return;
         }
+        hw_usleep(10000); // sleep 2 seconds between iterations
     }
 }
 
@@ -95,6 +106,7 @@ static void sharespace_reinit(MsgHead *p_arm_head) {
 void sharespace_init(void) {
     lprintf("sharespace_init: Starting initialization.\n");
     sharespace_get_config(&dts_sharespace);
+    sharespace_clear();
     lprintf("sharespace_init: Got config from DTS.\n");
     lprintf("sharespace_init: dsp_write_addr=0x%08x, arm_write_addr=0x%08x\n",
             dts_sharespace.dsp_write_addr, dts_sharespace.arm_write_addr);

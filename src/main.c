@@ -26,14 +26,6 @@ extern int linpack_main(void);
 extern int dhry_main(int t);
 extern void coremark_main(void);
 
-// Janky HW usleep() function using clock ticks!
-void hw_usleep(uint32_t usec) {
-    volatile uint32_t count = (configCPU_CLOCK_HZ / 1000000) * usec;
-    while (count--) {
-        __asm__ volatile ("nop");
-    }
-}
-
 /*
  *  Function to print banner
  */
@@ -84,12 +76,19 @@ int main(void) {
     log_init();
     lprintf("This is a test log message from the DSP.");
 
-    // Initialize the kbuf shared memory communication
-    sharespace_init();
-
+    /*lprintf("Counting to 15...\n");
     for(unsigned int i=0;i<12;++i) {
         lprintf("%s: %u\n", msg, i);
         hw_usleep(5000);
+    }*/
+
+    // Initialize the kbuf shared memory communication
+    sharespace_init();
+
+    lprintf("Counting to 15...\n");
+    for(unsigned int i=0;i<12;++i) {
+        lprintf("%s: %u\n", msg, i);
+        hw_usleep(1000);
     }
 
     xTaskCreate(vTaskMain, "Task Main", 4096, NULL, 1, &xHandleTaskMain);
