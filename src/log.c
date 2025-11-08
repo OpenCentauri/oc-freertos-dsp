@@ -28,22 +28,39 @@ void log_fake_init(void) {
 void log_init(void) {
     volatile struct spare_rtos_head_t *pstr = platform_head;
     volatile struct dts_msg_t *pdts = &pstr->rtos_img_hdr.dts_msg;
+    
+    printf("log_init: Checking DTS sharespace status...\n");
     if (pdts->dts_sharespace.status == DTS_OPEN) {
         log_buffer = (volatile uint8_t*)pdts->dts_sharespace.dsp_log_addr;
         log_buffer_size = pdts->dts_sharespace.dsp_log_size;
+        printf("log_init: DTS sharespace is OPEN\n");
+        printf("log_init:   log_buffer = 0x%08x\n", (unsigned int)log_buffer);
+        printf("log_init:   log_buffer_size = %u bytes\n", log_buffer_size);
+    } else {
+        printf("log_init: WARNING - DTS sharespace status is not OPEN (status = %d)\n", pdts->dts_sharespace.status);
     }
 
     if (log_buffer && log_buffer_size > 4) {
         log_write_ptr = (volatile uint32_t*)log_buffer;
+        printf("log_init: Calling log_clear()...\n");
         log_clear();
+        printf("log_init: log_clear() complete.\n");
+    } else {
+        printf("log_init: WARNING - log_buffer not properly initialized!\n");
     }
     lprintf("DSP logging kbuf initialized!\n");
+    printf("log_init: Complete.\n");
 }
 
 void log_clear(void) {
     if (log_write_ptr) {
+        printf("log_clear: Clearing log buffer at 0x%08x (size %u bytes)\n", 
+               (unsigned int)log_buffer, log_buffer_size);
         *log_write_ptr = 4; // Start writing after the write pointer itself.
         memset((void*)(log_buffer + 4), 0, log_buffer_size - 4);
+        printf("log_clear: Log buffer cleared.\n");
+    } else {
+        printf("log_clear: WARNING - log_write_ptr is NULL!\n");
     }
 }
 
@@ -61,8 +78,12 @@ void lprintf(const char *format, ...) {
     if (len <= 0) {
         return;
     }
-    temp_buffer[len] = '\n';
-    len++;
+    
+    // Don't add extra newline if the format already ends with one
+    if (temp_buffer[len - 1] != '\n') {
+        temp_buffer[len] = '\n';
+        len++;
+    }
 
     uint32_t current_write_pos = *log_write_ptr;
 

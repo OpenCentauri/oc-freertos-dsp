@@ -82,9 +82,13 @@ void sharespace_fake_init(void) {
 // Waits for the ARM core to initialize its side of the shared memory.
 static void sharespace_reinit(MsgHead *p_arm_head) {
     lprintf("sharespace_reinit: Waiting for ARM initialization...\n");
-    hw_usleep(10000); // sleep 10 seconds before looping
+    lprintf("sharespace_reinit: Will read ARM head from 0x%08x\n", (uint32_t)arm_head_ptr);
+    hw_usleep(10000); // sleep 10 milliseconds before looping
+    
+    int iteration = 0;
     while (1) {
-        lprintf("sharespace_reinit: Reading ARM head from 0x%08x\n", (uint32_t)arm_head_ptr);
+        iteration++;
+        lprintf("sharespace_reinit: Iteration %d - Reading ARM head from 0x%08x\n", iteration, (uint32_t)arm_head_ptr);
         memcpy(p_arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
         lprintf("sharespace_reinit: arm_head.init_state = %d\n", p_arm_head->init_state);
         lprintf("sharespace_reinit: arm_head.write_addr = 0x%08x\n", p_arm_head->write_addr);
@@ -98,7 +102,8 @@ static void sharespace_reinit(MsgHead *p_arm_head) {
             lprintf("sharespace_reinit: Sync complete.\n");
             return;
         }
-        hw_usleep(2000); // sleep 2 seconds between iterations
+        lprintf("sharespace_reinit: ARM not ready yet, sleeping 2 seconds...\n");
+        hw_usleep(2000000); // sleep 2 seconds between iterations
     }
 }
 
@@ -106,7 +111,6 @@ static void sharespace_reinit(MsgHead *p_arm_head) {
 void sharespace_init(void) {
     lprintf("sharespace_init: Starting initialization.\n");
     sharespace_get_config(&dts_sharespace);
-    sharespace_clear();
     lprintf("sharespace_init: Got config from DTS.\n");
     lprintf("sharespace_init: dsp_write_addr=0x%08x, arm_write_addr=0x%08x\n",
             dts_sharespace.dsp_write_addr, dts_sharespace.arm_write_addr);
@@ -114,14 +118,20 @@ void sharespace_init(void) {
     // Temporarily point to the initial handshake location in the DTS-defined sharespace
     arm_head_ptr = (volatile MsgHead*)(dts_sharespace.arm_write_addr + SHARE_SPACE_HEAD_OFFSET);
     lprintf("sharespace_init: arm_head_ptr initially set to 0x%08x\n", (uint32_t)arm_head_ptr);
+    
+    // Now that arm_head_ptr is set, we can call sharespace_clear()
+    sharespace_clear();
+    lprintf("sharespace_init: Called sharespace_clear() to invalidate old ARM head.\n");
 
     lprintf("sharespace_init: Calling sharespace_reinit() to get kbuf addresses.\n");
     MsgHead initial_arm_head;
     sharespace_reinit(&initial_arm_head);
     lprintf("sharespace_init: sharespace_reinit() returned.\n");
 
-    lprintf("sharespace_init: Got kbuf addresses from ARM: read_addr=0x%08x, write_addr=0x%08x\n",
-            initial_arm_head.read_addr, initial_arm_head.write_addr);
+    lprintf("sharespace_init: Got kbuf addresses from ARM:\n");
+    lprintf("sharespace_init:   read_addr (DSP->ARM buffer) = 0x%08x\n", initial_arm_head.read_addr);
+    lprintf("sharespace_init:   write_addr (ARM->DSP buffer) = 0x%08x\n", initial_arm_head.write_addr);
+    lprintf("sharespace_init:   init_state = %d\n", initial_arm_head.init_state);
 
     // Now that we have the kbuf addresses, update pointers to point to the kbuf memory regions.
     // ARM's write_addr is the buffer for ARM->DSP communication.
@@ -154,30 +164,39 @@ void sharespace_init(void) {
 
     MsgHead arm_head;
     lprintf("sharespace_init: Waiting for ARM to acknowledge with init_state=1.\n");
+    int poll_count = 0;
     while (1) {
+        poll_count++;
         memcpy(&arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
-        lprintf("sharespace_init: Polling ARM head (from kbuf): init_state=%d\n", arm_head.init_state);
+        lprintf("sharespace_init: Poll #%d - ARM head (from kbuf): init_state=%d, read_addr=0x%04x, write_addr=0x%04x\n", 
+                poll_count, arm_head.init_state, arm_head.read_addr, arm_head.write_addr);
         if (arm_head.init_state == 1) {
             sharespace_arm_addr[SHARESPACE_READ] = arm_head.read_addr;
             sharespace_arm_addr[SHARESPACE_WRITE] = arm_head.write_addr;
-            lprintf("sharespace_init: ARM acknowledged. read_addr=0x%04x, write_addr=0x%04x\n",
+            lprintf("sharespace_init: ARM acknowledged! Stored read_addr=0x%04x, write_addr=0x%04x\n",
                     sharespace_arm_addr[SHARESPACE_READ], sharespace_arm_addr[SHARESPACE_WRITE]);
             break;
         }
+        lprintf("sharespace_init: ARM not ready, sleeping 500ms...\n");
+        hw_usleep(500000); // sleep 500ms between polls
     }
     lprintf("sharespace_init: Initialization complete.\n");
 }
 
 // Invalidates the ARM's message head in shared memory.
 void sharespace_clear(void) {
-    sharespace_get_config(&dts_sharespace);
-    memset((void*)(dts_sharespace.arm_write_addr + SHARE_SPACE_HEAD_OFFSET), 0xa5, sizeof(MsgHead));
-
+    lprintf("sharespace_clear: Clearing ARM head at 0x%08x.\n", (uint32_t)arm_head_ptr);
+    
+    // Properly initialize the arm_head structure with known values
     MsgHead arm_head;
-    memcpy(&arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
-    arm_head.init_state = 2;
+    arm_head.read_addr = MIN_ADDR;
+    arm_head.write_addr = MIN_ADDR;
+    arm_head.init_state = 0;  // Start with init_state = 0 to signal DSP is ready
+    
     lprintf("sharespace_clear: Initializing ARM head: read_addr=0x%08x, write_addr=0x%08x, init_state=%d\n",
             arm_head.read_addr, arm_head.write_addr, arm_head.init_state);
+    
+    // Write the initialized structure to shared memory
     memcpy((void*)arm_head_ptr, &arm_head, sizeof(MsgHead));
     lprintf("sharespace_clear: Wrote ARM head to 0x%08x.\n", (uint32_t)arm_head_ptr);
 }

@@ -68,12 +68,16 @@ int main(void) {
 
     hw_usleep(200);
     print_banner();
+    
+    lprintf("main: Starting DSP initialization sequence...\n");
 
     char* msg = "Hello, World";
     int ret;
 
     // Initialize the kbuf shared memory communication
+    lprintf("main: Calling log_init()...\n");
     log_init();
+    lprintf("main: log_init() complete.\n");
     lprintf("This is a test log message from the DSP.");
 
     /*lprintf("Counting to 15...\n");
@@ -83,7 +87,9 @@ int main(void) {
     }*/
 
     // Initialize the kbuf shared memory communication
+    lprintf("main: Calling sharespace_init()...\n");
     sharespace_init();
+    lprintf("main: sharespace_init() complete.\n");
 
     lprintf("Counting to 15...\n");
     for(unsigned int i=0;i<12;++i) {
@@ -91,10 +97,13 @@ int main(void) {
         hw_usleep(1000);
     }
 
+    lprintf("main: Creating vTaskMain...\n");
     xTaskCreate(vTaskMain, "Task Main", 4096, NULL, 1, &xHandleTaskMain);
+    lprintf("main: Calling vTaskStartScheduler...\n");
     printf("vTaskStartScheduler\n");
     vTaskStartScheduler();
 
+    lprintf("main: ERROR - vTaskStartScheduler returned!\n");
     printf("vTaskStartScheduler FAILED!\n");
 /*
     // Initialize the shared memory communication
