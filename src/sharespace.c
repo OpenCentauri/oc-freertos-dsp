@@ -98,7 +98,7 @@ static void sharespace_reinit(MsgHead *p_arm_head) {
             lprintf("sharespace_reinit: Sync complete.\n");
             return;
         }
-        hw_usleep(10000); // sleep 2 seconds between iterations
+        hw_usleep(2000); // sleep 2 seconds between iterations
     }
 }
 
@@ -172,6 +172,14 @@ void sharespace_init(void) {
 void sharespace_clear(void) {
     sharespace_get_config(&dts_sharespace);
     memset((void*)(dts_sharespace.arm_write_addr + SHARE_SPACE_HEAD_OFFSET), 0xa5, sizeof(MsgHead));
+
+    MsgHead arm_head;
+    memcpy(&arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
+    arm_head.init_state = 2;
+    lprintf("sharespace_clear: Initializing ARM head: read_addr=0x%08x, write_addr=0x%08x, init_state=%d\n",
+            arm_head.read_addr, arm_head.write_addr, arm_head.init_state);
+    memcpy((void*)arm_head_ptr, &arm_head, sizeof(MsgHead));
+    lprintf("sharespace_clear: Wrote ARM head to 0x%08x.\n", (uint32_t)arm_head_ptr);
 }
 
 int sharespace_write(const void* data, int len) {
