@@ -215,6 +215,11 @@ void sharespace_clear(void) {
 
 int sharespace_write(const void* data, int len) {
     MsgHead dsp_head, arm_head;
+    
+    // Invalidate cache before reading shared memory
+    xthal_dcache_region_invalidate((void*)dsp_head_ptr, sizeof(MsgHead));
+    xthal_dcache_region_invalidate((void*)arm_head_ptr, sizeof(MsgHead));
+    
     memcpy(&dsp_head, (const void*)dsp_head_ptr, sizeof(MsgHead));
     memcpy(&arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
 
@@ -235,16 +240,19 @@ int sharespace_write(const void* data, int len) {
     const uint8_t* src = (const uint8_t*)data;
     if (local_write_addr + len <= MAX_ADDR) {
         memcpy((void*)(dsp_writes_to_arm + local_write_addr), src, len);
+        xthal_dcache_region_writeback((void*)(dsp_writes_to_arm + local_write_addr), len);
     } else {
         int len1 = MAX_ADDR - local_write_addr;
         memcpy((void*)(dsp_writes_to_arm + local_write_addr), src, len1);
+        xthal_dcache_region_writeback((void*)(dsp_writes_to_arm + local_write_addr), len1);
         int len2 = len - len1;
         memcpy((void*)(dsp_writes_to_arm + MIN_ADDR), src + len1, len2);
+        xthal_dcache_region_writeback((void*)(dsp_writes_to_arm + MIN_ADDR), len2);
     }
 
     dsp_head.write_addr = (local_write_addr + len) % (MAX_ADDR - MIN_ADDR) + MIN_ADDR;
     memcpy((void*)dsp_head_ptr, &dsp_head, sizeof(MsgHead));
-    //xthal_dcache_region_writeback((void*)dsp_head_ptr, sizeof(MsgHead));
+    xthal_dcache_region_writeback((void*)dsp_head_ptr, sizeof(MsgHead));
 
     uint32_t signal_msg = (dsp_head.write_addr << 16) | dsp_head.read_addr;
     //rpmsg_signal_host(signal_msg);
@@ -254,6 +262,10 @@ int sharespace_write(const void* data, int len) {
 
 int sharespace_read(void* out_buffer, int max_len) {
     MsgHead arm_head;
+    
+    // Invalidate cache before reading shared memory
+    xthal_dcache_region_invalidate((void*)arm_head_ptr, sizeof(MsgHead));
+    
     memcpy(&arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
 
     uint32_t host_write_addr = arm_head.write_addr;
@@ -274,16 +286,20 @@ int sharespace_read(void* out_buffer, int max_len) {
     uint8_t* dest = (uint8_t*)out_buffer;
 
     if (local_read_addr + bytes_to_copy <= MAX_ADDR) {
+        xthal_dcache_region_invalidate((void*)(dsp_reads_from_arm + local_read_addr), bytes_to_copy);
         memcpy(dest, (const void*)(dsp_reads_from_arm + local_read_addr), bytes_to_copy);
     } else {
         int len1 = MAX_ADDR - local_read_addr;
+        xthal_dcache_region_invalidate((void*)(dsp_reads_from_arm + local_read_addr), len1);
         memcpy(dest, (const void*)(dsp_reads_from_arm + local_read_addr), len1);
         int len2 = bytes_to_copy - len1;
+        xthal_dcache_region_invalidate((void*)(dsp_reads_from_arm + MIN_ADDR), len2);
         memcpy(dest + len1, (const void*)(dsp_reads_from_arm + MIN_ADDR), len2);
     }
 
     arm_head.read_addr = (local_read_addr + bytes_to_copy) % (MAX_ADDR - MIN_ADDR) + MIN_ADDR;
     memcpy((void*)arm_head_ptr, &arm_head, sizeof(MsgHead));
+    xthal_dcache_region_writeback((void*)arm_head_ptr, sizeof(MsgHead));
 
     return bytes_to_copy;
 }
