@@ -156,7 +156,46 @@ int outbyte(char c) {
     return 0;
 }
 
+// This actually is right, the function below querying registers returns the same thing...
 uint32_t xtbsp_clock_freq_hz(void) { return 600000000; }
+/*
+static volatile uint32_t* const dspclkreg = (volatile uint32_t*)SUNXI_DSP_CLK_REG;
+uint32_t xtbsp_clock_freq_hz(void)
+{
+    uint32_t val = *dspclkreg;
+    uint32_t src = (val >> 24) & 0x7;
+    uint32_t m = ((val >> 0) & 0x1F) + 1;
+    uint32_t n = ((val >> 8) & 0x3) + 1;
+
+    uint32_t freq = 0;
+
+    switch (src) {
+        case 0: // HOSC - 24MHz
+            freq = SUNXI_HOSC_FREQ / m / n;
+            break;
+        case 1: // CLK32K - 32kHz
+            freq = 32768 / m / n;
+            break;
+        case 2: // RC16M - 16MHz
+            freq = 16000000UL / m / n;
+            break;
+        case 3: // PLLPERI2X (usually 1200 MHz)
+            // Read PLL registers and calculate actual
+            // For now, assume 1200 MHz
+            freq = 1200000000UL / m / n;
+            break;
+        case 4: // PLLAUDIO1DIV2 (divided PLLAUDIO1)
+            // Read PLLAUDIO1CTRLREG for actual value.
+            // For now, assume 1536000000 / 2 = 768 MHz
+            freq = 768000000UL / m / n;
+            break;
+        default:
+            freq = 0; // Unknown/invalid source
+    }
+
+    return freq;
+}
+*/
 
 uint64_t xbsp_get_ccount(void) {
     static uint64_t cnt = 0;
