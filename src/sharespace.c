@@ -107,7 +107,7 @@ static void sharespace_reinit(MsgHead *p_arm_head) {
             return;
         }
         lprintf("sharespace_reinit: ARM not ready yet, sleeping 2 seconds...\n");
-        hw_usleep(2000000); // sleep 2 seconds between iterations
+        hw_usleep(2000); // sleep 2 seconds between iterations
     }
 }
 
@@ -185,8 +185,8 @@ void sharespace_init(void) {
                     sharespace_arm_addr[SHARESPACE_READ], sharespace_arm_addr[SHARESPACE_WRITE]);
             break;
         }
-        lprintf("sharespace_init: ARM not ready, sleeping 500ms...\n");
-        hw_usleep(500000); // sleep 500ms between polls
+        lprintf("sharespace_init: ARM not ready, sleeping 1000ms...\n");
+        hw_usleep(1000); // sleep 500ms between polls
     }
     lprintf("sharespace_init: Initialization complete.\n");
 }
@@ -199,7 +199,7 @@ void sharespace_clear(void) {
     MsgHead arm_head;
     arm_head.read_addr = MIN_ADDR;
     arm_head.write_addr = MIN_ADDR;
-    arm_head.init_state = 0;  // Start with init_state = 0 to signal DSP is ready
+    arm_head.init_state = 2;  // Start with init_state = 2 to signal DSP is ready
     
     lprintf("sharespace_clear: Initializing ARM head: read_addr=0x%08x, write_addr=0x%08x, init_state=%d\n",
             arm_head.read_addr, arm_head.write_addr, arm_head.init_state);
