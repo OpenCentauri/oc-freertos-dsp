@@ -103,6 +103,8 @@ static volatile struct intc_regs *(pintc_regs) = (volatile struct intc_regs *)
         SUNXI_R_INTC_PBASE;
 void board_init(void) {
     _cache_config();
+    
+    /* Initialize R_INTC (external interrupt controller) */
     pintc_regs->enable = 0x0;
     pintc_regs->mask = 0x0;
     pintc_regs->pending = 0xffffffff;
@@ -114,6 +116,26 @@ void board_init(void) {
     pintc_regs->enable2 = 0x0;
     pintc_regs->mask2 = 0x0;
     pintc_regs->pending2 = 0xffffffff;
+    
+    /* Enable DSP clock and deassert reset
+     * According to R528 documentation, DSP_BGR_REG controls DSP bus gating and reset
+     * Bit 16: DSP_RST - DSP Reset (1 = deassert, 0 = assert)
+     * Bit 0: DSP_GATING - DSP Clock Gating (1 = enable, 0 = disable)
+     */
+    #define CCU_BASE 0x02001000
+    #define DSP_BGR_REG (CCU_BASE + 0x0C70)
+    uint32_t dsp_bgr = readl(DSP_BGR_REG);
+    dsp_bgr |= (1 << 16) | (1 << 0);  /* Deassert reset and enable clock */
+    writel(DSP_BGR_REG, dsp_bgr);
+    
+    /* Enable DSP Timer 0 and Timer 1 interrupts in R_INTC
+     * These might be needed even for Xtensa internal timers on this platform
+     */
+    pintc_regs->enable |= (1 << SUNXI_DSP_IRQ_DSP_TIMER0) | (1 << SUNXI_DSP_IRQ_DSP_TIMER1);
+    
+    /* Small delay to let clock stabilize */
+    volatile int i;
+    for (i = 0; i < 10000; i++);
 }
 
 int outbyte(char c) {
