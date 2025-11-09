@@ -103,8 +103,6 @@ static volatile struct intc_regs *(pintc_regs) = (volatile struct intc_regs *)
         SUNXI_R_INTC_PBASE;
 void board_init(void) {
     _cache_config();
-    
-    /* Initialize R_INTC (external interrupt controller) */
     pintc_regs->enable = 0x0;
     pintc_regs->mask = 0x0;
     pintc_regs->pending = 0xffffffff;
@@ -116,37 +114,6 @@ void board_init(void) {
     pintc_regs->enable2 = 0x0;
     pintc_regs->mask2 = 0x0;
     pintc_regs->pending2 = 0xffffffff;
-    
-    #define CCU_BASE 0x02001000
-    
-    /* Enable DSP clock and deassert reset
-     * DSP_BGR_REG controls DSP bus gating and reset
-     * Bit 16: DSP_RST - DSP Reset (1 = deassert, 0 = assert)
-     * Bit 0: DSP_GATING - DSP Clock Gating (1 = enable, 0 = disable)
-     */
-    #define DSP_BGR_REG (CCU_BASE + 0x0C70)
-    uint32_t dsp_bgr = readl(DSP_BGR_REG);
-    dsp_bgr |= (1 << 16) | (1 << 0);  /* Deassert reset and enable clock */
-    writel(DSP_BGR_REG, dsp_bgr);
-    
-    /* Enable DSP Timer clock and deassert reset
-     * DSP_TIMER_BGR_REG controls DSP timer bus gating and reset
-     * Bit 16: DSP_TIMER_RST - Timer Reset (1 = deassert, 0 = assert)
-     * Bit 0: DSP_TIMER_GATING - Timer Clock Gating (1 = enable, 0 = disable)
-     */
-    #define DSP_TIMER_BGR_REG (CCU_BASE + 0x0C7C)
-    uint32_t timer_bgr = readl(DSP_TIMER_BGR_REG);
-    timer_bgr |= (1 << 16) | (1 << 0);  /* Deassert reset and enable clock */
-    writel(DSP_TIMER_BGR_REG, timer_bgr);
-    
-    /* Enable DSP Timer 0 and Timer 1 interrupts in R_INTC
-     * These might be needed even for Xtensa internal timers on this platform
-     */
-    pintc_regs->enable |= (1 << SUNXI_DSP_IRQ_DSP_TIMER0) | (1 << SUNXI_DSP_IRQ_DSP_TIMER1);
-    
-    /* Small delay to let clocks stabilize */
-    volatile int i;
-    for (i = 0; i < 10000; i++);
 }
 
 int outbyte(char c) {
@@ -156,46 +123,7 @@ int outbyte(char c) {
     return 0;
 }
 
-// This actually is right, the function below querying registers returns the same thing...
 uint32_t xtbsp_clock_freq_hz(void) { return 600000000; }
-/*
-static volatile uint32_t* const dspclkreg = (volatile uint32_t*)SUNXI_DSP_CLK_REG;
-uint32_t xtbsp_clock_freq_hz(void)
-{
-    uint32_t val = *dspclkreg;
-    uint32_t src = (val >> 24) & 0x7;
-    uint32_t m = ((val >> 0) & 0x1F) + 1;
-    uint32_t n = ((val >> 8) & 0x3) + 1;
-
-    uint32_t freq = 0;
-
-    switch (src) {
-        case 0: // HOSC - 24MHz
-            freq = SUNXI_HOSC_FREQ / m / n;
-            break;
-        case 1: // CLK32K - 32kHz
-            freq = 32768 / m / n;
-            break;
-        case 2: // RC16M - 16MHz
-            freq = 16000000UL / m / n;
-            break;
-        case 3: // PLLPERI2X (usually 1200 MHz)
-            // Read PLL registers and calculate actual
-            // For now, assume 1200 MHz
-            freq = 1200000000UL / m / n;
-            break;
-        case 4: // PLLAUDIO1DIV2 (divided PLLAUDIO1)
-            // Read PLLAUDIO1CTRLREG for actual value.
-            // For now, assume 1536000000 / 2 = 768 MHz
-            freq = 768000000UL / m / n;
-            break;
-        default:
-            freq = 0; // Unknown/invalid source
-    }
-
-    return freq;
-}
-*/
 
 uint64_t xbsp_get_ccount(void) {
     static uint64_t cnt = 0;
