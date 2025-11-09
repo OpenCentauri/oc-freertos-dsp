@@ -252,9 +252,9 @@ void vPortDumpTimerStatus(void) {
   extern unsigned _xt_tick_divisor;
   uint32_t ccount, ccompare, intenable;
   
-  __asm__ volatile("rsr %0, CCOUNT" : "=a"(ccount));
-  __asm__ volatile("rsr %0, CCOMPARE_0" : "=a"(ccompare));
-  __asm__ volatile("rsr %0, INTENABLE" : "=a"(intenable));
+  __asm__ volatile("rsr.ccount %0" : "=a"(ccount));
+  __asm__ volatile("rsr.ccompare0 %0" : "=a"(ccompare));
+  __asm__ volatile("rsr.intenable %0" : "=a"(intenable));
   
   printf("DSP_log: Timer Status:\n");
   printf("  CCOUNT=%lu\n", (unsigned long)ccount);
