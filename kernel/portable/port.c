@@ -189,7 +189,14 @@ BaseType_t xPortStartScheduler(void) {
 #endif
 
   port_xSchedulerRunning = 1;
-  printf("DSP_log: Calling _frxt_dispatch\n");
+  
+  /* Output a simple character pattern to UART without printf */
+  extern int outbyte(char c);
+  const char* msg = "DSP_log: dispatch\n";
+  for (const char* p = msg; *p; p++) {
+    outbyte(*p);
+  }
+  
   // Cannot be directly called from C; never returns
   __asm__ volatile("call0    _frxt_dispatch\n");
 
