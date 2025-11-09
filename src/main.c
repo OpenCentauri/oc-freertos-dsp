@@ -16,8 +16,9 @@
 #include "FreeRTOS.h"
 #include "platform.h"
 #include "sharespace.h"
-#include "task.h"
+#include "rpmsg.h"
 #include "log.h"
+#include "task.h"
 
 /*
  *  External function prototypes
@@ -88,6 +89,9 @@ int main(void) {
         lprintf("%s: %u\n", msg, i);
         hw_usleep(5000);
     }*/
+
+    lprintf("main: Calling rpmsg_init()...\n");
+    rpmsg_init();
 
     // Initialize the kbuf shared memory communication
     lprintf("main: Calling sharespace_init()...\n");

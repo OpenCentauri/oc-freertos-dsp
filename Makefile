@@ -58,8 +58,8 @@ LIBS =  -L ./lib/  -lxtutil  -lhandler-reset -lc -lgloss -lhal -lm -lgcc -lc
 APP_SRC := src/main
 APP_SRC += src/sharespace
 APP_SRC += src/log
+APP_SRC += src/rpmsg
 #APP_SRC += src/hal_msgbox src/msgboxx src/share_space
-#APP_SRC += src/rpmsg
 
 BENCHMARK_SRC := benchmark/linpack-pc
 BENCHMARK_SRC += benchmark/dhry_1

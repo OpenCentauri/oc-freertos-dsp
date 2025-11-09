@@ -26,9 +26,14 @@ static struct dts_sharespace_t mmap_sharespace;
 
 // platform_head is defined as a macro in platform.h
 
-// This is a placeholder for the hardware-specific function that will trigger
-// an RPMsg interrupt to notify the host that new data is available.
-extern void rpmsg_signal_host(uint32_t msg);
+// This function sends a signal to the ARM via the msgbox channel.
+// It's used to notify the ARM that the DSP has updated shared memory.
+extern void dsp_msgbox_channel_send(uint32_t ch, uint8_t *bf, uint32_t len);
+
+static void msgbox_send_signal(uint32_t signal) {
+    // Send a 4-byte signal to the ARM via msgbox channel 0
+    dsp_msgbox_channel_send(0, (uint8_t *)&signal, sizeof(uint32_t));
+}
 
 // Janky HW usleep() function using clock ticks!
 void hw_usleep(uint32_t usec) {
@@ -83,7 +88,7 @@ void sharespace_fake_init(void) {
 static void sharespace_reinit(MsgHead *p_arm_head) {
     lprintf("sharespace_reinit: Waiting for ARM initialization...\n");
     lprintf("sharespace_reinit: Will read ARM head from 0x%08x\n", (uint32_t)arm_head_ptr);
-    hw_usleep(10000); // sleep 10 milliseconds before looping
+    hw_usleep(200); // sleep 200 milliseconds before looping
     
     int iteration = 0;
     while (1) {
@@ -165,6 +170,11 @@ void sharespace_init(void) {
     lprintf("sharespace_init: Wrote DSP head to 0x%08x.\n", (uint32_t)dsp_head_ptr);
     xthal_dcache_region_writeback((void*)dsp_head_ptr, sizeof(MsgHead));
     lprintf("sharespace_init: Flushed cache for DSP head region at 0x%08x, size %d.\n", (uint32_t)dsp_head_ptr, sizeof(MsgHead));
+    
+    // Signal the ARM that the DSP head has been updated
+    uint32_t signal_msg = (dsp_head.write_addr << 16) | dsp_head.read_addr;
+    msgbox_send_signal(signal_msg);
+    lprintf("sharespace_init: Signaled ARM with message 0x%08x.\n", signal_msg);
 
     MsgHead arm_head;
     lprintf("sharespace_init: Waiting for ARM to acknowledge with init_state=1.\n");
@@ -254,8 +264,9 @@ int sharespace_write(const void* data, int len) {
     memcpy((void*)dsp_head_ptr, &dsp_head, sizeof(MsgHead));
     xthal_dcache_region_writeback((void*)dsp_head_ptr, sizeof(MsgHead));
 
+    // Signal the ARM that the DSP has updated its write pointer
     uint32_t signal_msg = (dsp_head.write_addr << 16) | dsp_head.read_addr;
-    //rpmsg_signal_host(signal_msg);
+    msgbox_send_signal(signal_msg);
 
     return len;
 }
@@ -300,6 +311,10 @@ int sharespace_read(void* out_buffer, int max_len) {
     arm_head.read_addr = (local_read_addr + bytes_to_copy) % (MAX_ADDR - MIN_ADDR) + MIN_ADDR;
     memcpy((void*)arm_head_ptr, &arm_head, sizeof(MsgHead));
     xthal_dcache_region_writeback((void*)arm_head_ptr, sizeof(MsgHead));
+
+    // Signal the ARM that the DSP has updated the ARM head's read pointer
+    uint32_t signal_msg = (arm_head.write_addr << 16) | arm_head.read_addr;
+    msgbox_send_signal(signal_msg);
 
     return bytes_to_copy;
 }
