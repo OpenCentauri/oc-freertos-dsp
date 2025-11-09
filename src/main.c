@@ -25,10 +25,16 @@ extern void coremark_main(void);
 /*
  *  Main task function
  */
+extern void vPortDumpTimerStatus(void);
+
 void vTaskMain(void *pvParameters) {
     (void) pvParameters;
+    printf("DSP_log: vTaskMain started\n");
     dsp_msgbox_init(0x00);
+    printf("DSP_log: vTaskMain loop: 0\n");
+    vPortDumpTimerStatus();
     vTaskDelay(500);
+    printf("DSP_log: vTaskMain loop: 1 (after first delay)\n");
     dhry_main(10000000);
     linpack_main();
     coremark_main();

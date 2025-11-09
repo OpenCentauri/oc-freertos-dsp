@@ -53,9 +53,11 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <xtensa/config/core.h>
 
 #include "xtensa_rtos.h"
+#include "xtensa_timer.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -166,15 +168,19 @@ BaseType_t xPortStartScheduler(void) {
   // Interrupts are disabled at this point and stack contains PS with enabled
   // interrupts when task context is restored
 
+  printf("DSP_log: xPortStartScheduler starting\n");
+
 #if XCHAL_CP_NUM > 0
   /* Initialize co-processor management for tasks. Leave CPENABLE alone. */
   _xt_coproc_init();
 #endif
 
   /* Init the tick divisor value */
+  printf("DSP_log: Calling _xt_tick_divisor_init\n");
   _xt_tick_divisor_init();
 
   /* Setup the hardware to generate the tick. */
+  printf("DSP_log: Calling _frxt_tick_timer_init\n");
   _frxt_tick_timer_init();
 
 #if XT_USE_THREAD_SAFE_CLIB
@@ -183,6 +189,7 @@ BaseType_t xPortStartScheduler(void) {
 #endif
 
   port_xSchedulerRunning = 1;
+  printf("DSP_log: Calling _frxt_dispatch\n");
   // Cannot be directly called from C; never returns
   __asm__ volatile("call0    _frxt_dispatch\n");
 
@@ -194,6 +201,12 @@ BaseType_t xPortStartScheduler(void) {
 BaseType_t xPortSysTickHandler(void) {
   BaseType_t ret;
   uint32_t interruptMask;
+
+  static uint32_t tick_count = 0;
+  if (tick_count < 5) {
+    printf("DSP_log: Timer tick %lu\n", (unsigned long)tick_count);
+  }
+  tick_count++;
 
   portbenchmarkIntLatency();
   /* Interrupts upto configMAX_SYSCALL_INTERRUPT_PRIORITY must be
@@ -233,3 +246,27 @@ void vPortStoreTaskMPUSettings(xMPU_SETTINGS *xMPUSettings,
   (void)xRegions;
 }
 #endif
+
+/* Debug function to check timer configuration */
+void vPortDumpTimerStatus(void) {
+  extern unsigned _xt_tick_divisor;
+  uint32_t ccount, ccompare, intenable;
+  
+  __asm__ volatile("rsr %0, CCOUNT" : "=a"(ccount));
+  __asm__ volatile("rsr %0, CCOMPARE_0" : "=a"(ccompare));
+  __asm__ volatile("rsr %0, INTENABLE" : "=a"(intenable));
+  
+  printf("DSP_log: Timer Status:\n");
+  printf("  CCOUNT=%lu\n", (unsigned long)ccount);
+  printf("  CCOMPARE0=%lu\n", (unsigned long)ccompare);
+  printf("  INTENABLE=0x%lx\n", (unsigned long)intenable);
+  printf("  tick_divisor=%lu\n", (unsigned long)_xt_tick_divisor);
+  printf("  XT_TIMER_INTEN=0x%x\n", XT_TIMER_INTEN);
+  
+  if (ccompare > ccount) {
+    uint32_t cycles_remaining = ccompare - ccount;
+    printf("  cycles until next tick=%lu\n", (unsigned long)cycles_remaining);
+  } else {
+    printf("  WARNING: CCOMPARE is in the past!\n");
+  }
+}
