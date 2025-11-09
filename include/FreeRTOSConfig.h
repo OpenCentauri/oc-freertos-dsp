@@ -112,7 +112,8 @@
 #define configUSE_TICKLESS_IDLE 		2
 
 /* Default clock rate for simulator */
-#define configCPU_CLOCK_HZ				2000000
+/* This value is obtained from xtbsp_clock_freq_hz() in arch/board-init.c */
+#define configCPU_CLOCK_HZ				600000000
 
 /* This has impact on speed of search for highest priority */
 #define configMAX_PRIORITIES			( 25 )

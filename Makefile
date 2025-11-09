@@ -34,10 +34,13 @@ IFLAGS += -I ./benchmark
 IFLAGS += -I ./benchmark/coremark
 IFLAGS += -I ./benchmark/coremark/xtensa
 
-DFLAGS := -DXT_BOARD  -DXT_TIMER_INDEX=0 -DXT_USE_SWPRI -DSTANDALONE=1 
+DFLAGS := -DXT_BOARD -DXT_USE_SWPRI -DSTANDALONE=1 
+DFLAGS := -DXT_TIMER_INDEX=0
 DFLAGS += -DXTUTIL_NO_OVERRIDE 
 DFLAGS += -DMAIN_HAS_NOARGC
 DFLAGS += -DPERFORMANCE_RUN=1 -DITERATIONS=23000
+# Enable use SW timers
+#DFLAGS += -DconfigUSE_TIMERS
 
 CFLAGS  := -Wa,--longcalls -static -O2  -Wall -mtext-section-literals  -fno-inline-functions
 CFLAGS  += -ffunction-sections -fdata-sections  -mlongcalls  $(DFLAGS) $(IFLAGS)
@@ -53,7 +56,10 @@ LDFLAGS += -Wl,--script link.ld
 LIBS =  -L ./lib/  -lxtutil  -lhandler-reset -lc -lgloss -lhal -lm -lgcc -lc
 
 APP_SRC := src/main
-APP_SRC += src/rpmsg
+APP_SRC += src/sharespace
+APP_SRC += src/log
+#APP_SRC += src/hal_msgbox src/msgboxx src/share_space
+#APP_SRC += src/rpmsg
 
 BENCHMARK_SRC := benchmark/linpack-pc
 BENCHMARK_SRC += benchmark/dhry_1
@@ -149,7 +155,7 @@ $(BUILDDIR)/%.o: %.c
 	$(Q)$(CC) -c $(CFLAGS) -o $@ $<
 
 install:
-	scp build/dsp.elf carbon2:/mnt/exUDISK/
+	scp build/dsp.elf carbon-devu:/mnt/exUDISK/
 
 clean:
 	$(Q)rm -rf $(BUILDDIR)
