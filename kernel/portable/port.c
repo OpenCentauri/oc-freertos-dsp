@@ -179,8 +179,9 @@ BaseType_t xPortStartScheduler(void) {
   printf("DSP_log: Calling _xt_tick_divisor_init\n");
   _xt_tick_divisor_init();
 
+  printf("DSP_log: About to init timer and dispatch\n");
+  
   /* Setup the hardware to generate the tick. */
-  printf("DSP_log: Calling _frxt_tick_timer_init\n");
   _frxt_tick_timer_init();
 
 #if XT_USE_THREAD_SAFE_CLIB
@@ -189,13 +190,6 @@ BaseType_t xPortStartScheduler(void) {
 #endif
 
   port_xSchedulerRunning = 1;
-  
-  /* Output a simple character pattern to UART without printf */
-  extern int outbyte(char c);
-  const char* msg = "DSP_log: dispatch\n";
-  for (const char* p = msg; *p; p++) {
-    outbyte(*p);
-  }
   
   // Cannot be directly called from C; never returns
   __asm__ volatile("call0    _frxt_dispatch\n");
