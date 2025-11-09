@@ -55,13 +55,13 @@ void vTaskMain(void *pvParameters) {
     (void) pvParameters;
 
     //dsp_msgbox_init(0x00);
-    printf("DSP_log: vTaskMain loop: 0\n");
+    printf("DSP: vTaskMain loop: 0\n");
     vPortDumpTimerStatus();
     vTaskDelay(1000);
-    printf("DSP_log: vTaskMain loop: 1 (after first delay)\n");
+    printf("DSP: vTaskMain loop: 1 (after first delay)\n");
     //printf("Bob Dole Lives!!!\n");
     for(unsigned int i=2;;++i) {
-        lprintf("vTaskMain loop: %u\n", i);
+        printf("DSP: vTaskMain loop: %u\n", i);
         vTaskDelay(1000);
     }
 }
@@ -98,6 +98,8 @@ int main(void) {
         lprintf("%s: %u\n", msg, i);
         hw_usleep(1000);
     }*/
+    lprintf("Sleeping 1 second, then starting Task Main...");
+    hw_usleep(1000);
 
     xTaskCreate(vTaskMain, "Task Main", 4096, NULL, 1, &xHandleTaskMain);
     printf("vTaskStartScheduler\n");
