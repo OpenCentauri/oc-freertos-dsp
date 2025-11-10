@@ -252,11 +252,30 @@ void vPortStoreTaskMPUSettings(xMPU_SETTINGS *xMPUSettings,
 /* Debug function to check timer configuration */
 void vPortDumpTimerStatus(void) {
   extern unsigned _xt_tick_divisor;
+  extern int outbyte(char c);
   uint32_t ccount, ccompare, intenable;
   
+  // Debug marker 1
+  const char* msg1 = "DSP: Reading CCOUNT\n";
+  for (const char* p = msg1; *p; p++) outbyte(*p);
+  
   __asm__ volatile("rsr.ccount %0" : "=a"(ccount));
+  
+  // Debug marker 2
+  const char* msg2 = "DSP: Reading CCOMPARE0\n";
+  for (const char* p = msg2; *p; p++) outbyte(*p);
+  
   __asm__ volatile("rsr.ccompare0 %0" : "=a"(ccompare));
+  
+  // Debug marker 3
+  const char* msg3 = "DSP: Reading INTENABLE\n";
+  for (const char* p = msg3; *p; p++) outbyte(*p);
+  
   __asm__ volatile("rsr.intenable %0" : "=a"(intenable));
+  
+  // Debug marker 4
+  const char* msg4 = "DSP: About to print values\n";
+  for (const char* p = msg4; *p; p++) outbyte(*p);
   
   lprintf("DSP: Timer Status:\n");
   lprintf("  CCOUNT=%lu\n", (unsigned long)ccount);
@@ -271,4 +290,8 @@ void vPortDumpTimerStatus(void) {
   } else {
     lprintf("  WARNING: CCOMPARE is in the past!\n");
   }
+  
+  // Debug marker 5
+  const char* msg5 = "DSP: Finished timer status dump\n";
+  for (const char* p = msg5; *p; p++) outbyte(*p);
 }
