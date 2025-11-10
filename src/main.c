@@ -53,11 +53,26 @@ void print_banner(void) {
  */
 void vTaskMain(void *pvParameters) {
     (void) pvParameters;
+    
+    extern int outbyte(char c);
+    
+    // Simple output without printf
+    const char* msg1 = "DSP: vTaskMain started\n";
+    for (const char* p = msg1; *p; p++) outbyte(*p);
 
     //dsp_msgbox_init(0x00);
     printf("DSP: vTaskMain loop: 0\n");
+    
+    const char* msg2 = "DSP: About to dump timer status\n";
+    for (const char* p = msg2; *p; p++) outbyte(*p);
+    
     vPortDumpTimerStatus();
+    
+    const char* msg3 = "DSP: About to call vTaskDelay\n";
+    for (const char* p = msg3; *p; p++) outbyte(*p);
+    
     vTaskDelay(1000);
+    
     printf("DSP: vTaskMain loop: 1 (after first delay)\n");
     //printf("Bob Dole Lives!!!\n");
     for(unsigned int i=2;;++i) {
