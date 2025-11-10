@@ -35,11 +35,11 @@ IFLAGS += -I ./benchmark/coremark
 IFLAGS += -I ./benchmark/coremark/xtensa
 
 DFLAGS := -DXT_BOARD -DXT_USE_SWPRI -DSTANDALONE=1 
-DFLAGS := -DXT_TIMER_INDEX=0
 DFLAGS += -DXTUTIL_NO_OVERRIDE 
 DFLAGS += -DMAIN_HAS_NOARGC
 DFLAGS += -DPERFORMANCE_RUN=1 -DITERATIONS=23000
 # Enable use SW timers
+#DFLAGS += -DXT_TIMER_INDEX=0
 #DFLAGS += -DconfigUSE_TIMERS
 
 CFLAGS  := -Wa,--longcalls -static -O2  -Wall -mtext-section-literals  -fno-inline-functions
