@@ -53,11 +53,14 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <xtensa/config/core.h>
 
 #include "xtensa_rtos.h"
+#include "xtensa_timer.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "log.h"
 
 /* Defined in portasm.h */
 extern void _frxt_tick_timer_init(void);
@@ -166,14 +169,19 @@ BaseType_t xPortStartScheduler(void) {
   // Interrupts are disabled at this point and stack contains PS with enabled
   // interrupts when task context is restored
 
+  lprintf("DSP: xPortStartScheduler starting\n");
+
 #if XCHAL_CP_NUM > 0
   /* Initialize co-processor management for tasks. Leave CPENABLE alone. */
   _xt_coproc_init();
 #endif
 
   /* Init the tick divisor value */
+  lprintf("DSP: Calling _xt_tick_divisor_init\n");
   _xt_tick_divisor_init();
 
+  lprintf("DSP: About to init timer and dispatch\n");
+  
   /* Setup the hardware to generate the tick. */
   _frxt_tick_timer_init();
 
@@ -183,6 +191,7 @@ BaseType_t xPortStartScheduler(void) {
 #endif
 
   port_xSchedulerRunning = 1;
+  
   // Cannot be directly called from C; never returns
   __asm__ volatile("call0    _frxt_dispatch\n");
 
@@ -194,6 +203,12 @@ BaseType_t xPortStartScheduler(void) {
 BaseType_t xPortSysTickHandler(void) {
   BaseType_t ret;
   uint32_t interruptMask;
+
+  static uint32_t tick_count = 0;
+  if (tick_count < 5) {
+    lprintf("DSP: Timer tick %lu\n", (unsigned long)tick_count);
+  }
+  tick_count++;
 
   portbenchmarkIntLatency();
   /* Interrupts upto configMAX_SYSCALL_INTERRUPT_PRIORITY must be
@@ -233,3 +248,50 @@ void vPortStoreTaskMPUSettings(xMPU_SETTINGS *xMPUSettings,
   (void)xRegions;
 }
 #endif
+
+/* Debug function to check timer configuration */
+void vPortDumpTimerStatus(void) {
+  extern unsigned _xt_tick_divisor;
+  extern int outbyte(char c);
+  uint32_t ccount, ccompare, intenable;
+  
+  // Debug marker 1
+  const char* msg1 = "DSP: Reading CCOUNT\n";
+  for (const char* p = msg1; *p; p++) outbyte(*p);
+  
+  __asm__ volatile("rsr.ccount %0" : "=a"(ccount));
+  
+  // Debug marker 2
+  const char* msg2 = "DSP: Reading CCOMPARE0\n";
+  for (const char* p = msg2; *p; p++) outbyte(*p);
+  
+  __asm__ volatile("rsr.ccompare0 %0" : "=a"(ccompare));
+  
+  // Debug marker 3
+  const char* msg3 = "DSP: Reading INTENABLE\n";
+  for (const char* p = msg3; *p; p++) outbyte(*p);
+  
+  __asm__ volatile("rsr.intenable %0" : "=a"(intenable));
+  
+  // Debug marker 4
+  const char* msg4 = "DSP: About to print values\n";
+  for (const char* p = msg4; *p; p++) outbyte(*p);
+  
+  lprintf("DSP: Timer Status:\n");
+  lprintf("  CCOUNT=%lu\n", (unsigned long)ccount);
+  lprintf("  CCOMPARE0=%lu\n", (unsigned long)ccompare);
+  lprintf("  INTENABLE=0x%lx\n", (unsigned long)intenable);
+  lprintf("  tick_divisor=%lu\n", (unsigned long)_xt_tick_divisor);
+  lprintf("  XT_TIMER_INTEN=0x%x\n", XT_TIMER_INTEN);
+  
+  if (ccompare > ccount) {
+    uint32_t cycles_remaining = ccompare - ccount;
+    lprintf("  cycles until next tick=%lu\n", (unsigned long)cycles_remaining);
+  } else {
+    lprintf("  WARNING: CCOMPARE is in the past!\n");
+  }
+  
+  // Debug marker 5
+  const char* msg5 = "DSP: Finished timer status dump\n";
+  for (const char* p = msg5; *p; p++) outbyte(*p);
+}

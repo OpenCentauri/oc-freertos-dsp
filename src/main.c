@@ -25,6 +25,7 @@
 extern int linpack_main(void);
 extern int dhry_main(int t);
 extern void coremark_main(void);
+extern void vPortDumpTimerStatus(void);
 
 /*
  *  Function to print banner
@@ -52,10 +53,27 @@ void print_banner(void) {
  */
 void vTaskMain(void *pvParameters) {
     (void) pvParameters;
+    
+    extern int outbyte(char c);
+    
+    // Simple output without lprintf
+    lprintf("DSP: vTaskMain started\n");
 
-    //printf("Bob Dole Lives!!!\n");
-    for(unsigned int i=0;;++i) {
-        lprintf("vTaskMain loop: %u\n", i);
+    //dsp_msgbox_init(0x00);
+    lprintf("DSP: vTaskMain loop: 0\n");
+    
+    lprintf("DSP: About to dump timer status\n");
+
+    vPortDumpTimerStatus();
+    
+    lprintf("DSP: About to call vTaskDelay\n");
+    
+    vTaskDelay(1000);
+    
+    printf("Bob Dole Lives!!!\n");
+    lprintf("DSP: vTaskMain loop: 1 (after first delay)\n");
+    for(unsigned int i=2;;++i) {
+        lprintf("DSP: vTaskMain loop: %u\n", i);
         vTaskDelay(1000);
     }
 }
@@ -76,6 +94,8 @@ int main(void) {
     log_init();
     lprintf("This is a test log message from the DSP.");
 
+    //dsp_msgbox_init(0x00);
+
     /*lprintf("Counting to 15...\n");
     for(unsigned int i=0;i<12;++i) {
         lprintf("%s: %u\n", msg, i);
@@ -85,17 +105,19 @@ int main(void) {
     // Initialize the kbuf shared memory communication
     sharespace_init();
 
-    lprintf("Counting to 15...\n");
+    /*lprintf("Counting to 15...\n");
     for(unsigned int i=0;i<12;++i) {
         lprintf("%s: %u\n", msg, i);
         hw_usleep(1000);
-    }
+    }*/
+    lprintf("Sleeping 1 second, then starting Task Main...");
+    hw_usleep(1000);
 
     xTaskCreate(vTaskMain, "Task Main", 4096, NULL, 1, &xHandleTaskMain);
-    printf("vTaskStartScheduler\n");
+    lprintf("vTaskStartScheduler\n");
     vTaskStartScheduler();
 
-    printf("vTaskStartScheduler FAILED!\n");
+    lprintf("vTaskStartScheduler FAILED!\n");
 /*
     // Initialize the shared memory communication
     //sharespace_init();
@@ -119,10 +141,10 @@ int main(void) {
     print_banner();
 
     xTaskCreate(vTaskMain, "Task Main", 4096, NULL, 1, &xHandleTaskMain);
-    printf("vTaskStartScheduler\n");
+    lprintf("vTaskStartScheduler\n");
     vTaskStartScheduler();
 
-    printf("vTaskStartScheduler FAILED!\n");
+    lprintf("vTaskStartScheduler FAILED!\n");
 */
     return 1;
 }

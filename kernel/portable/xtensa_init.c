@@ -48,12 +48,19 @@ void _xt_tick_divisor_init(void) {
 #ifdef XT_CLOCK_FREQ
 
   _xt_tick_divisor = (XT_CLOCK_FREQ / XT_TICK_PER_SEC);
+  extern int printf(const char *, ...);
+  printf("DSP_log: Using XT_CLOCK_FREQ=%lu, divisor=%lu\n", 
+         (unsigned long)XT_CLOCK_FREQ, (unsigned long)_xt_tick_divisor);
 
 #else
 
 #ifdef XT_BOARD
   extern uint32_t xtbsp_clock_freq_hz(void);
-  _xt_tick_divisor = xtbsp_clock_freq_hz() / XT_TICK_PER_SEC;
+  extern int printf(const char *, ...);
+  uint32_t freq = xtbsp_clock_freq_hz();
+  _xt_tick_divisor = freq / XT_TICK_PER_SEC;
+  printf("DSP_log: Using xtbsp_clock_freq_hz()=%lu Hz, tick_per_sec=%lu, divisor=%lu\n",
+         (unsigned long)freq, (unsigned long)XT_TICK_PER_SEC, (unsigned long)_xt_tick_divisor);
 #else
 #error "No way to obtain processor clock frequency"
 #endif /* XT_BOARD */
