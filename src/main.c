@@ -56,27 +56,24 @@ void vTaskMain(void *pvParameters) {
     
     extern int outbyte(char c);
     
-    // Simple output without printf
-    const char* msg1 = "DSP: vTaskMain started\n";
-    for (const char* p = msg1; *p; p++) outbyte(*p);
+    // Simple output without lprintf
+    lprintf("DSP: vTaskMain started\n");
 
     //dsp_msgbox_init(0x00);
-    printf("DSP: vTaskMain loop: 0\n");
+    lprintf("DSP: vTaskMain loop: 0\n");
     
-    const char* msg2 = "DSP: About to dump timer status\n";
-    for (const char* p = msg2; *p; p++) outbyte(*p);
-    
+    lprintf("DSP: About to dump timer status\n");
+
     vPortDumpTimerStatus();
     
-    const char* msg3 = "DSP: About to call vTaskDelay\n";
-    for (const char* p = msg3; *p; p++) outbyte(*p);
+    lprintf("DSP: About to call vTaskDelay\n");
     
     vTaskDelay(1000);
     
-    printf("DSP: vTaskMain loop: 1 (after first delay)\n");
-    //printf("Bob Dole Lives!!!\n");
+    printf("Bob Dole Lives!!!\n");
+    lprintf("DSP: vTaskMain loop: 1 (after first delay)\n");
     for(unsigned int i=2;;++i) {
-        printf("DSP: vTaskMain loop: %u\n", i);
+        lprintf("DSP: vTaskMain loop: %u\n", i);
         vTaskDelay(1000);
     }
 }
@@ -117,10 +114,10 @@ int main(void) {
     hw_usleep(1000);
 
     xTaskCreate(vTaskMain, "Task Main", 4096, NULL, 1, &xHandleTaskMain);
-    printf("vTaskStartScheduler\n");
+    lprintf("vTaskStartScheduler\n");
     vTaskStartScheduler();
 
-    printf("vTaskStartScheduler FAILED!\n");
+    lprintf("vTaskStartScheduler FAILED!\n");
 /*
     // Initialize the shared memory communication
     //sharespace_init();
@@ -144,10 +141,10 @@ int main(void) {
     print_banner();
 
     xTaskCreate(vTaskMain, "Task Main", 4096, NULL, 1, &xHandleTaskMain);
-    printf("vTaskStartScheduler\n");
+    lprintf("vTaskStartScheduler\n");
     vTaskStartScheduler();
 
-    printf("vTaskStartScheduler FAILED!\n");
+    lprintf("vTaskStartScheduler FAILED!\n");
 */
     return 1;
 }
