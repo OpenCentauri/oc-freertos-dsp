@@ -53,10 +53,11 @@ void print_banner(void) {
 void vTaskMain(void *pvParameters) {
     (void) pvParameters;
 
-    //printf("Bob Dole Lives!!!\n");
+    lprintf("Bob Dole Lives!!!\n");
     for(unsigned int i=0;;++i) {
         lprintf("vTaskMain loop: %u\n", i);
-        vTaskDelay(1000);
+        hw_usleep(1000);
+        //vTaskDelay(1000);
     }
 }
 
@@ -65,12 +66,11 @@ void vTaskMain(void *pvParameters) {
  */
 int main(void) {
     xTaskHandle xHandleTaskMain;
+    int ret;
 
     hw_usleep(200);
     print_banner();
 
-    char* msg = "Hello, World";
-    int ret;
 
     // Initialize the kbuf shared memory communication
     log_init();
@@ -85,10 +85,25 @@ int main(void) {
     // Initialize the kbuf shared memory communication
     sharespace_init();
 
-    lprintf("Counting to 15...\n");
-    for(unsigned int i=0;i<12;++i) {
-        lprintf("%s: %u\n", msg, i);
+    lprintf("Counting to 5...\n");
+    for(unsigned int i=0;i<5;++i) {
+        lprintf("Hello, World!: %u\n", i);
         hw_usleep(1000);
+    }
+
+    // Test out the DSP/ARM comms, wait for message and respond!
+    int read_len;
+    char buf[1024];
+    int buf_len = sizeof(buf);
+    char buf2[buf_len * 2];
+    int buf2_len;
+    for(unsigned int i=0;;++i) {
+        read_len = sharespace_read(buf, buf_len);
+        lprintf("Read message #%u (bytes=%d, len=%d): %s\n", i, read_len, strlen(buf), buf);
+        snprintf(buf2, buf_len, "ALLO GOVNAH %u: %s", i, buf);
+        buf2_len=strlen(buf2)+1;
+        lprintf("Writing message #%u (bytes=%d, len=%d): %s\n", i, buf2_len, strlen(buf2), buf2);
+        sharespace_write(buf2, buf2_len);
     }
 
     xTaskCreate(vTaskMain, "Task Main", 4096, NULL, 1, &xHandleTaskMain);
