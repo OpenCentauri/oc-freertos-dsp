@@ -184,36 +184,56 @@ void sharespace_clear(void) {
 
 int sharespace_write(const void* data, int len) {
     MsgHead dsp_head, arm_head;
+    
+    // Invalidate ARM head cache to get fresh data
+    xthal_dcache_region_invalidate((void*)arm_head_ptr, sizeof(MsgHead));
+    
     memcpy(&dsp_head, (const void*)dsp_head_ptr, sizeof(MsgHead));
     memcpy(&arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
 
-    uint32_t host_read_addr = dsp_head.read_addr; // ARM reads from DSP buffer
+    uint32_t host_read_addr = arm_head.read_addr; // ARM's read position in DSP->ARM buffer
     uint32_t local_write_addr = dsp_head.write_addr;
+
+    lprintf("sharespace_write: host_read_addr=0x%04x, local_write_addr=0x%04x, len=%d\n",
+            host_read_addr, local_write_addr, len);
 
     int free_size;
     if (host_read_addr <= local_write_addr) {
-        free_size = (MAX_ADDR - local_write_addr) + (host_read_addr - MIN_ADDR);
+        free_size = MAX_ADDR - MIN_ADDR - (local_write_addr - host_read_addr);
     } else {
         free_size = host_read_addr - local_write_addr;
     }
 
-    if (free_size <= len + 1) { // Leave 1 byte for full/empty check
+    lprintf("sharespace_write: free_size=%d\n", free_size);
+
+    if (free_size <= len) {
+        lprintf("sharespace_write: buffer full, cannot write\n");
         return -1;
     }
 
     const uint8_t* src = (const uint8_t*)data;
     if (local_write_addr + len <= MAX_ADDR) {
         memcpy((void*)(dsp_writes_to_arm + local_write_addr), src, len);
+        local_write_addr += len;
+        if (local_write_addr >= MAX_ADDR) {
+            local_write_addr = MIN_ADDR;
+        }
     } else {
         int len1 = MAX_ADDR - local_write_addr;
         memcpy((void*)(dsp_writes_to_arm + local_write_addr), src, len1);
         int len2 = len - len1;
         memcpy((void*)(dsp_writes_to_arm + MIN_ADDR), src + len1, len2);
+        local_write_addr = MIN_ADDR + len2;
     }
 
-    dsp_head.write_addr = (local_write_addr + len) % (MAX_ADDR - MIN_ADDR) + MIN_ADDR;
+    dsp_head.write_addr = local_write_addr;
     memcpy((void*)dsp_head_ptr, &dsp_head, sizeof(MsgHead));
-    //xthal_dcache_region_writeback((void*)dsp_head_ptr, sizeof(MsgHead));
+    
+    // Flush written data and head to memory
+    xthal_dcache_region_writeback((void*)(dsp_writes_to_arm + MIN_ADDR), MAX_ADDR - MIN_ADDR);
+    xthal_dcache_region_writeback((void*)dsp_head_ptr, sizeof(MsgHead));
+
+    lprintf("sharespace_write: new write_addr=0x%04x\n", dsp_head.write_addr);
 
     uint32_t signal_msg = (dsp_head.write_addr << 16) | dsp_head.read_addr;
     //rpmsg_signal_host(signal_msg);
@@ -222,13 +242,23 @@ int sharespace_write(const void* data, int len) {
 }
 
 int sharespace_read(void* out_buffer, int max_len) {
-    MsgHead arm_head;
+    MsgHead dsp_head, arm_head;
+    
+    // Invalidate ARM head and data cache to read fresh data from ARM
+    xthal_dcache_region_invalidate((void*)arm_head_ptr, sizeof(MsgHead));
+    xthal_dcache_region_invalidate((void*)(dsp_reads_from_arm + MIN_ADDR), MAX_ADDR - MIN_ADDR);
+    
     memcpy(&arm_head, (const void*)arm_head_ptr, sizeof(MsgHead));
+    memcpy(&dsp_head, (const void*)dsp_head_ptr, sizeof(MsgHead));
 
-    uint32_t host_write_addr = arm_head.write_addr;
-    uint32_t local_read_addr = arm_head.read_addr;
+    uint32_t host_write_addr = arm_head.write_addr; // ARM's write position in ARM->DSP buffer
+    uint32_t local_read_addr = dsp_head.read_addr;   // DSP's read position in ARM->DSP buffer
+
+    lprintf("sharespace_read: host_write_addr=0x%04x, local_read_addr=0x%04x\n",
+            host_write_addr, local_read_addr);
 
     if (local_read_addr == host_write_addr) {
+        lprintf("sharespace_read: no data available\n");
         return 0;
     }
 
@@ -239,20 +269,30 @@ int sharespace_read(void* out_buffer, int max_len) {
         msg_size = (MAX_ADDR - local_read_addr) + (host_write_addr - MIN_ADDR);
     }
 
+    lprintf("sharespace_read: msg_size=%d, max_len=%d\n", msg_size, max_len);
+
     int bytes_to_copy = (msg_size < max_len) ? msg_size : max_len;
     uint8_t* dest = (uint8_t*)out_buffer;
 
     if (local_read_addr + bytes_to_copy <= MAX_ADDR) {
         memcpy(dest, (const void*)(dsp_reads_from_arm + local_read_addr), bytes_to_copy);
+        local_read_addr += bytes_to_copy;
+        if (local_read_addr >= MAX_ADDR) {
+            local_read_addr = MIN_ADDR;
+        }
     } else {
         int len1 = MAX_ADDR - local_read_addr;
         memcpy(dest, (const void*)(dsp_reads_from_arm + local_read_addr), len1);
         int len2 = bytes_to_copy - len1;
         memcpy(dest + len1, (const void*)(dsp_reads_from_arm + MIN_ADDR), len2);
+        local_read_addr = MIN_ADDR + len2;
     }
 
-    arm_head.read_addr = (local_read_addr + bytes_to_copy) % (MAX_ADDR - MIN_ADDR) + MIN_ADDR;
-    memcpy((void*)arm_head_ptr, &arm_head, sizeof(MsgHead));
+    dsp_head.read_addr = local_read_addr;
+    memcpy((void*)dsp_head_ptr, &dsp_head, sizeof(MsgHead));
+    xthal_dcache_region_writeback((void*)dsp_head_ptr, sizeof(MsgHead));
+
+    lprintf("sharespace_read: read %d bytes, new read_addr=0x%04x\n", bytes_to_copy, dsp_head.read_addr);
 
     return bytes_to_copy;
 }
