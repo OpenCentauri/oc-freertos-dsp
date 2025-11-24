@@ -91,13 +91,41 @@ int main(void) {
         hw_usleep(1000);
     }
 
+    char buf[4096];
+
+    for (int b = 0; b < 5; b++)
+    {
+        char* test_message = "Hello, world! %d";
+
+        sprintf(buf, test_message, b);
+
+        sharespace_write(buf, strlen(buf) + 1);
+        sharespace_read(buf, 4096);
+        hw_usleep(1000);
+    }
+
+    for (;;)
+    {
+        hw_usleep(1000);
+        int read_len = sharespace_read(buf, 4096);
+        if (read_len <= 0)
+        {
+            lprintf("Waiting...\n");
+            continue;
+        }
+
+        sharespace_write(buf, read_len);
+    }
+
     // Test out the DSP/ARM comms, wait for message and respond!
     int read_len;
-    char buf[1024];
+    
     int buf_len = sizeof(buf);
     char buf2[buf_len * 2];
     int buf2_len;
     for(unsigned int i=0;;++i) {
+        lprintf("Looping...\n");
+        hw_usleep(1000);
         read_len = sharespace_read(buf, buf_len);
         lprintf("Read message #%u (bytes=%d, len=%d): %s\n", i, read_len, strlen(buf), buf);
         snprintf(buf2, buf_len, "ALLO GOVNAH %u: %s", i, buf);
@@ -105,6 +133,9 @@ int main(void) {
         lprintf("Writing message #%u (bytes=%d, len=%d): %s\n", i, buf2_len, strlen(buf2), buf2);
         sharespace_write(buf2, buf2_len);
     }
+
+    lprintf("Broken free!\n");
+    hw_usleep(1000);
 
     xTaskCreate(vTaskMain, "Task Main", 4096, NULL, 1, &xHandleTaskMain);
     printf("vTaskStartScheduler\n");
