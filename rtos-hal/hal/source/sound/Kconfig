@@ -1,0 +1,12 @@
+menuconfig DRIVERS_SOUND
+	bool "Sound card support"
+	default y
+
+if DRIVERS_SOUND
+config SND_CORE_TINY
+	bool "support tiny alsa sound core and alsa-lib"
+	default n
+
+source "drivers/hal/source/sound/codecs/Kconfig"
+source "drivers/hal/source/sound/platform/Kconfig"
+endif # SOUND

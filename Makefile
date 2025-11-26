@@ -24,6 +24,7 @@ BUILDDIR = ./build
 APP := $(BUILDDIR)/$(APP_NAME).elf
 
 IFLAGS := -I ./include
+IFLAGS += -I ./include/xtensa
 IFLAGS += -I ./arch
 IFLAGS += -I ./arch/include
 IFLAGS += -I ./src
@@ -33,6 +34,10 @@ IFLAGS += -I ./include/freertos/private
 IFLAGS += -I ./benchmark
 IFLAGS += -I ./benchmark/coremark
 IFLAGS += -I ./benchmark/coremark/xtensa
+IFLAGS += -I ./rtos-hal/include
+IFLAGS += -I ./rtos-hal/include/hal
+IFLAGS += -I ./rtos-hal/include/osal
+IFLAGS += -I ./rtos-hal/hal/source
 
 DFLAGS := -DXT_BOARD -DXT_USE_SWPRI -DSTANDALONE=1 
 DFLAGS := -DXT_TIMER_INDEX=0
@@ -41,6 +46,10 @@ DFLAGS += -DMAIN_HAS_NOARGC
 DFLAGS += -DPERFORMANCE_RUN=1 -DITERATIONS=23000
 # Enable use SW timers
 #DFLAGS += -DconfigUSE_TIMERS
+# RTOS HAL configuration
+DFLAGS += -DCONFIG_KERNEL_FREERTOS
+DFLAGS += -DCONFIG_CORE_DSP0
+DFLAGS += -DCONFIG_ARCH_SUN8IW20
 
 CFLAGS  := -Wa,--longcalls -static -O2  -Wall -mtext-section-literals  -fno-inline-functions
 CFLAGS  += -ffunction-sections -fdata-sections  -mlongcalls  $(DFLAGS) $(IFLAGS)
@@ -58,8 +67,20 @@ LIBS =  -L ./lib/  -lxtutil  -lhandler-reset -lc -lgloss -lhal -lm -lgcc -lc
 APP_SRC := src/main
 APP_SRC += src/sharespace
 APP_SRC += src/log
+APP_SRC += src/gpio_toggle_example
 #APP_SRC += src/hal_msgbox src/msgboxx src/share_space
 #APP_SRC += src/rpmsg
+
+# OSAL (Operating System Abstraction Layer) sources
+OSAL_SRC := src/osal/hal_mem
+OSAL_SRC += src/osal/hal_interrupt
+OSAL_SRC += src/osal/hal_atomic
+OSAL_SRC += src/osal/hal_cache
+OSAL_SRC += src/osal/hal_sem
+OSAL_SRC += src/osal/hal_mutex
+OSAL_SRC += src/osal/hal_queue
+OSAL_SRC += src/osal/hal_timer
+OSAL_SRC += src/osal/hal_thread
 
 BENCHMARK_SRC := benchmark/linpack-pc
 BENCHMARK_SRC += benchmark/dhry_1
@@ -100,11 +121,24 @@ KERNEL_SRC += kernel/portable/xtensa_intr_asm
 KERNEL_SRC += kernel/portable/xtensa_overlay_os_hook
 KERNEL_SRC += kernel/portable/xtensa_vectors
 
+# RTOS HAL source files
+RTOS_HAL_SRC := rtos-hal/hal/source/common/dma_alloc
+RTOS_HAL_SRC += rtos-hal/hal/source/gpio/hal_gpio
+RTOS_HAL_SRC += rtos-hal/hal/source/gpio/sun8iw20/gpio-sun8iw20
+# Add more HAL modules as needed:
+# RTOS_HAL_SRC += rtos-hal/hal/source/msgbox/msgbox_sx/msgbox_sx
+# RTOS_HAL_SRC += rtos-hal/hal/source/msgbox/msgbox_sx/msgbox_adapt
+# RTOS_HAL_SRC += rtos-hal/hal/source/msgbox/msgbox_sx/hal_msgbox_sx
+# RTOS_HAL_SRC += rtos-hal/hal/source/uart/hal_uart
+# RTOS_HAL_SRC += rtos-hal/hal/source/timer/hal_timer
+
 SRC := $(APP_SRC)
 SRC += $(OEM_SRC)
 SRC += $(STARTUP_SRC)
 SRC += $(KERNEL_SRC)
 SRC += $(BENCHMARK_SRC)
+SRC += $(OSAL_SRC)
+SRC += $(RTOS_HAL_SRC)
 
 LIB_PIECES = $(SRC)
 
@@ -120,6 +154,7 @@ all: clean builddir $(APP)
 builddir:
 	$(Q)$(MKDIR) $(BUILDDIR)
 	$(Q)$(MKDIR) $(BUILDDIR)/src
+	$(Q)$(MKDIR) $(BUILDDIR)/src/osal
 	$(Q)$(MKDIR) $(BUILDDIR)/arch
 	$(Q)$(MKDIR) $(BUILDDIR)/oemhead
 	$(Q)$(MKDIR) $(BUILDDIR)/kernel/FreeRTOS
@@ -130,6 +165,12 @@ builddir:
 	$(Q)$(MKDIR) $(BUILDDIR)/benchmark/coremark
 	$(Q)$(MKDIR) $(BUILDDIR)/benchmark/coremark/xtensa
 	$(Q)$(MKDIR) $(BUILDDIR)/output
+	$(Q)$(MKDIR) $(BUILDDIR)/rtos-hal/hal/source/common
+	$(Q)$(MKDIR) $(BUILDDIR)/rtos-hal/hal/source/msgbox/msgbox_sx
+	$(Q)$(MKDIR) $(BUILDDIR)/rtos-hal/hal/source/uart
+	$(Q)$(MKDIR) $(BUILDDIR)/rtos-hal/hal/source/gpio
+	$(Q)$(MKDIR) $(BUILDDIR)/rtos-hal/hal/source/gpio/sun8iw20
+	$(Q)$(MKDIR) $(BUILDDIR)/rtos-hal/hal/source/timer
 
 $(APP): include/version.h $(LIB_OBJS)
 	$(Q)echo [LD] LINKING $@

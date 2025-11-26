@@ -12,6 +12,7 @@
 #include <xtensa/tie/xt_externalregisters.h>
 #include <xtensa/xtruntime.h>
 #include <xtensa_api.h>
+#include "gpio_toggle_example.h"
 
 #include "FreeRTOS.h"
 #include "platform.h"
@@ -142,6 +143,7 @@ int main(void) {
     vTaskStartScheduler();
 
     printf("vTaskStartScheduler FAILED!\n");
+    gpio_toggle_example_init();
 /*
     // Initialize the shared memory communication
     //sharespace_init();
